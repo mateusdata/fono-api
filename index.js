@@ -4,8 +4,8 @@ const sequelize = require('./src/Config/Databases/Database');
 const app = express();
 const port = 3000;
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 app.get('/users', async (req, res) => {
   try {
     const usuarios = await sequelize.query('SELECT * FROM usuarios');
