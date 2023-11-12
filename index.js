@@ -6,7 +6,6 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
-
 app.get('/users', async (req, res) => {
   try {
     const usuarios = await sequelize.query('SELECT * FROM usuarios');
@@ -17,8 +16,8 @@ app.get('/users', async (req, res) => {
   }
 });
 
-app.get('/', async (req, res) => {
-  res.send({fono:"fono api"});
+app.get('/',  (req, res) => {
+  res.send({ fono: "fono api" });
 });
 
 app.listen(port, () => {
