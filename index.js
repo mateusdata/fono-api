@@ -1,45 +1,26 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const app = (0, express_1.default)();
+const express = require("express");
+const cors = require("cors");
+const app = express();
+app.use(express.json());
+app.use(cors());
+const AuthRouter = require("./src/routes/auth");
+const ApiRouter = require("./src/routes/api");
 const port = process.env.PORT || 3001;
-app.get('/', (_req, res) => {
-    const data = [
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 },
-        { nome: "maria", idade: 25 }, { nome: "maria", idade: 25 },
-    ];
-    res.send(data);
-    return res.send(data);
+const ResetController = require("./src/controllers/ResetController");
+const TesteController = require("./src/controllers/TesteController");
+const sequelize = require("./src/config/sequelize");
+const SchedulesController = require("./src/controllers/SchedulesController");
+app.use("/", AuthRouter);
+app.use("/", ApiRouter);
+app.get("/", function (req, res) {
+  res.send({ projeto: "API fonoapp"});
 });
-app.get('/ping', (_req, res) => {
-    return res.send('pong 🏓');
-});
+
+app.post("/recuperaremail", ResetController.recuperarEmail);
+app.post("/validarcodigo", ResetController.validarCodigo);
+app.post("/resetarsenha", ResetController.resetarSenha);
+app.get("/rotateste", TesteController.testarBanco);
+app.get("/teacher_list", SchedulesController.show_teacher);
 app.listen(port, () => {
-    return console.log(`Server is listening on ${port}`);
+   console.log("Servidor rodando na porta " + port);
 });
