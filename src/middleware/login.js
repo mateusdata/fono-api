@@ -7,7 +7,6 @@ const middlewareUser = (req, res, next) => {
   if (!tokenHeader) {
     return res.status(403).send("Acesso negado");
   }
-
   const token = tokenHeader.split(" ")[1];
 
   try {
