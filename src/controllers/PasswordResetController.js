@@ -49,6 +49,7 @@ class PasswordResetController {
                 const hash = bcrypt.hashSync(newPassword, salt);
                 const updateUser = await User.update({ password: hash }, { where: { user_id: user.user_id } });
                 if (updateUser) {
+                    EmailController.passwordChanged(email);
                     return res.send({ message: "Senha atualizada com sucesso!" });
                 }
                 return res.status(400).send({ message: "Ocorreu um erro ao atualizar a senha" });

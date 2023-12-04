@@ -4,6 +4,7 @@ require('dotenv').config();
 const sgMail = require("@sendgrid/mail");
 const welcome = require("../template/welcome.js")
 const sendCode = require("../template/sendCode.js")
+const chagedPassword = require("../template/passwordChange.js")
 
 class EmailController {
 
@@ -44,6 +45,31 @@ class EmailController {
       sgMail
         .send(msg)
         .then(() => {
+        })
+        .catch((error) => {
+          console.error("Erro ao enviar email ", error);
+        });
+    }
+
+  }
+
+
+  async passwordChanged(email){
+
+    if (email) {
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+      const msg = {
+        to: email,
+        from: { email: 'engsextosemestre@gmail.com', name: 'Fonotherapp' },
+        subject: "Senha alterada",
+        text: "Fonotherapp",
+        html: `${chagedPassword()}`
+      };
+      sgMail
+        .send(msg)
+        .then(() => {
+          console.log("Email enviado")
         })
         .catch((error) => {
           console.error("Erro ao enviar email ", error);
