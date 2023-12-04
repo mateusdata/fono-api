@@ -1,32 +1,28 @@
 const jwt = require("jsonwebtoken");
-const chaveSecreta = "mateus";
 const bcrypt = require('bcrypt');
-const UserModel = require("../models/UserModel");
+const User = require("../models/User");
+require('dotenv').config();
 
 class AuthController {
   async login(req, res) {
-    const { email, senha } = req.body;
-    console.log(email, senha);
+    const { email, password } = req.body;
 
     try {
-      const user = await UserModel.findOne({
+      const user = await User.findOne({
         where: { email: email }
       });
 
       if (!user) {
         return res.status(400).json({ status: 401, message: "Usuário inexistente" });
       }
-      const isValidUser = await bcrypt.compare(senha, user.senha);
-      
-      console.log(senha.length + " " + user.senha.length);
-
+      const isValidUser = await bcrypt.compare(password, user.password);
       if (isValidUser) {
-        const token = jwt.sign({ id_token:user.id}, chaveSecreta, {
-          expiresIn: "500m",
+        const token = jwt.sign({ id_token:user.id}, process.env.secretKey, {
+          expiresIn: "30s",
         });
         return res.send({ token, nome: user.nome });
       } else {
-        return res.status(400).json({ status: 401, message: "Usuario ou senha incorreta Senha incorreta"});
+        return res.status(400).json({ status: 401, message: "password incorreta"});
       }
     } catch (err) {
       console.error(err);
@@ -36,7 +32,7 @@ class AuthController {
 
   async getUsers(req, res) {
     try {
-      const users = await UserModel.findAll({
+      const users = await User.findAll({
         attributes: ['nome', 'email', 'cargo']
       });
       res.send(users);

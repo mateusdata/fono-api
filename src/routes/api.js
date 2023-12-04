@@ -6,5 +6,6 @@ const middleareUser = require("../middleware/login");
 
 router.get("/talogado",middleareUser , ()=>{
 });
+
 module.exports = router;
 

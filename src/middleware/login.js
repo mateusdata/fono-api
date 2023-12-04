@@ -3,14 +3,14 @@ const chaveSecreta = "mateus";
 
 const middlewareUser = (req, res, next) => {
   const tokenHeader = req.header("Authorization");
-  
+  console.log(tokenHeader);
   if (!tokenHeader) {
     return res.status(403).send("Acesso negado");
   }
   const token = tokenHeader.split(" ")[1];
 
   try {
-    jwt.verify(token, chaveSecreta, (err, decode) => {
+    jwt.verify(token, process.env.secretKey, (err, decode) => {
       if (err) {
         return res.status(401).json({ message: "Token inválido ou expirado" });
       }
