@@ -53,7 +53,6 @@ class EmailController {
 
   }
 
-
   async passwordChanged(email){
 
     if (email) {

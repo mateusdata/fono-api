@@ -19,7 +19,7 @@ class RegisterController {
   }
 
   async createUser(req, res) {
-    const {first_name, sur_name, last_name, cpf, birthday, email, password} = req.body;
+    const {first_name, sur_name, last_name, cpf, birthday} = req.body;
     try {
       const person  = await Person.create({first_name,sur_name,last_name, cpf,birthday});
       const salt = await bcrypt.genSalt(5);

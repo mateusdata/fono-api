@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 const User = require("../models/User");
+const Person = require("../models/Person");
 require('dotenv').config();
 
 class AuthController {
@@ -18,9 +19,10 @@ class AuthController {
       const isValidUser = await bcrypt.compare(password, user.password);
       if (isValidUser) {
         const token = jwt.sign({ id_token:user.id}, process.env.secretKey, {
-          expiresIn: "30s",
+          expiresIn: "60s",
         });
-        return res.send({ token, nome: user.nome });
+        const person = await Person.findOne({ where: { per_id: user.per_id }, attributes: ["first_name"] });
+          return res.send({ token, email:user.email, name:person.first_name});
       } else {
         return res.status(400).json({ status: 401, message: "password incorreta"});
       }
