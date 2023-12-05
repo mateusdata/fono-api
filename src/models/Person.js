@@ -44,7 +44,7 @@ Person.init({
   sequelize,
   modelName: 'Person',
   tableName: 'person',
-  timestamps: true,
+  timestamps: false,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 });
