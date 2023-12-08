@@ -21,12 +21,13 @@ class PasswordResetController {
             }
             res.status(400).send({ mensage: "Usuario inexistente" });
         } catch (erro) {
-            res.status(500).send({ mensage: "Erro no" });
+            res.status(500).send({ mensage: "Erro no servidor" });
         }
     }
 
     async verifyResetCode(req, res) {
-        const { email,verification_code } = req.body;
+        const { email, verification_code } = req.body;
+        console.log(req.body);
         try {
             const user = await User.findOne({ where: { email, verification_code }, attributes: ['email', 'user_id', "verification_code", "expiration_date"] });
             console.log(verification_code == user.verification_code);

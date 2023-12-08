@@ -19,7 +19,7 @@ class RegisterController {
   }
 
   async createUser(req, res) {
-    const {first_name, sur_name, last_name, cpf, birthday, password, email } = req.body;
+    const {first_name, sur_name, last_name, cpf, birthday, password, email} = req.body;
     try {
       const person  = await Person.create({first_name,sur_name,last_name, cpf,birthday});
       const salt = await bcrypt.genSalt(5);
@@ -30,7 +30,7 @@ class RegisterController {
           expiresIn: "20s",
         });
          const sendEmail =  await EmailController.welcome(email,  first_name);
-        return res.send({ token, name: user.first_name, sendEmail:sendEmail });
+        return res.send({ token, name: user.first_name, sendEmail:sendEmail, message:"Usuario cadastrado com sucesso!" });
       }
       res.status(500).send("Ocorreu um erro");
     } catch (error) {

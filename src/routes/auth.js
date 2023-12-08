@@ -12,7 +12,6 @@ router.post("/login", AuthController.login);
 router.post("/send-reset-code", PasswordResetController.sendResetCode);
 router.post("/verify-reset-code", PasswordResetController.verifyResetCode);
 router.post("/reset-password", PasswordResetController.resetPassword);
-
 router.get("/islogged",middlewareUser , AuthController.isLogged);
 
 module.exports = router;
