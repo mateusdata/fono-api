@@ -30,6 +30,7 @@ class RegisterController {
           expiresIn: "20s",
         });
          const sendEmail =  await EmailController.welcome(email,  first_name);
+         console.log("usuarios criado com sucesso");
         return res.send({ token, name: user.first_name, sendEmail:sendEmail, message:"Usuario cadastrado com sucesso!" });
       }
       res.status(500).send("Ocorreu um erro");
