@@ -25,6 +25,7 @@ class RegisterController {
       const salt = await bcrypt.genSalt(5);
       const hash = await bcrypt.hash(password, salt);
       const user  = await User.create({per_id: person.per_id, email, password:hash});
+
       if (user && person) {
         const token = jwt.sign({ id_token:user.user_id}, process.env.secretKey, {
           expiresIn: "20s",
@@ -33,9 +34,10 @@ class RegisterController {
          console.log("usuarios criado com sucesso");
         return res.send({ token, name: user.first_name, sendEmail:sendEmail, message:"Usuario cadastrado com sucesso!" });
       }
-      res.status(500).send("Ocorreu um erro");
+       const personDelete =  await Person.destroy({where:{per_id:person.per_id}})
+      res.status(404).send({mensage:"Erro ao cadastrar, verifique todos os campos", personDelete:personDelete});
     } catch (error) {
-      res.status(500).send({ error: "Ocoreu um erro "  +   error.message });
+      res.status(500).send({ mensage: "Ocoreu um erro no cervidor"  +   error.message });
       console.error(error);
     }
   }
