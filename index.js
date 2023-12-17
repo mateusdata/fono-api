@@ -12,8 +12,8 @@ app.use("/", ApiRouter);
 app.get("/", async function (req, res) {
   res.send({ projeto: "API fonoapp"});
 });
-app.use('/public', express.static(path.join(__dirname, '/public/images')));
+app.use('/public', express.static(path.join(__dirname, '/public/videos')));
 
-app.listen(3003, () => {
-   console.log("Servidor rodando na porta " + 3003);
+app.listen(3001, () => {
+   console.log("Servidor rodando na porta " + 3001);
 });
