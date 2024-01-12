@@ -3,34 +3,25 @@ require('dotenv').config();
 
 const sequelize = require("../config/sequelize")
 
-class Person extends Model {}
+class Doctor extends Model {}
 
-Person.init({
-  per_id: {
+Doctor.init({
+  doc_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
-  first_name: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
-  },
-  middle_name: {
-    type: DataTypes.STRING(50),
+  gov_license:{
+    type: DataTypes.INTEGER,
     allowNull: true,
   },
-  last_name: {
-    type: DataTypes.STRING(50),
-    allowNull: true,
-  },
-  cpf: {
-    type: DataTypes.STRING(11),
+  status: {
+    type: DataTypes.STRING(10),
     allowNull: false,
-    unique:true
-  },
-  birthday: {
-    type: DataTypes.DATE,
-    allowNull: false,
+    defaultValue: 'active',
+    validate: {
+      isIn: [['active', 'banned', 'inactive']]
+    }
   },
   created_at: {
     type: DataTypes.DATE,
@@ -42,11 +33,11 @@ Person.init({
   },
 }, {
   sequelize,
-  modelName: 'Person',
-  tableName: 'person',
+  modelName: 'Doctor',
+  tableName: 'doctor',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 });
 
-module.exports =  Person;
+module.exports =  Doctor;
