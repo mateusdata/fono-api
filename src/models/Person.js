@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
-require('dotenv').config();
-
-const sequelize = require("../config/sequelize")
+const sequelize = require("../config/sequelize");
+const User = require('./User');
+const PersonHasUser = require('./PersonHasUser');
 
 class Person extends Model {}
 
@@ -14,10 +14,6 @@ Person.init({
   first_name: {
     type: DataTypes.STRING(50),
     allowNull: false,
-  },
-  sur_name: {
-    type: DataTypes.STRING(50),
-    allowNull: true,
   },
   last_name: {
     type: DataTypes.STRING(50),
@@ -48,5 +44,8 @@ Person.init({
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 });
+
+User.belongsToMany(Person, {through: PersonHasUser, foreignKey: 'use_id', otherKey: 'per_id' });
+Person.belongsToMany(User, {through: PersonHasUser, foreignKey: 'per_id', otherKey: 'use_id' });
 
 module.exports =  Person;

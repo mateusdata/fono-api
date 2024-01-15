@@ -1,24 +1,32 @@
 const jwt = require("jsonwebtoken");
-const chaveSecreta = "mateus";
+
 
 const middlewareUser = (req, res, next) => {
   const tokenHeader = req.header("Authorization");
-  console.log(tokenHeader);
+
   if (!tokenHeader) {
-    return res.status(403).send("Acesso negado");
+    return res.status(403).send("Access Unauthorized");
   }
+
   const token = tokenHeader.split(" ")[1];
 
   try {
+
     jwt.verify(token, process.env.secretKey, (err, decode) => {
+      
       if (err) {
-        return res.status(401).json({ message: "Token inválido ou expirado" });
+        return res.status(401).json({ message: "Token is invalid or expired" });
       }
+
       req.id_token = decode.id_token;
       next();
+
     });
+
   } catch {
-    return res.status(500).json({ message: "Erro interno no servidor", token });
+
+    return res.status(500).json({ message: "Internal erorr", token });
+
   }
 };
 

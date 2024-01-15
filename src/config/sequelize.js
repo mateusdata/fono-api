@@ -1,9 +1,6 @@
 const { Sequelize } = require('sequelize');
-const mysql2 = require('mysql2');
 const pg = require('pg');
 require('dotenv').config();
-
-//const user = await prisma.users.delete({ where: {id: 1}});
 
 const sequelize = new Sequelize(
   process.env.psql,

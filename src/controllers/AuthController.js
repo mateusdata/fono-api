@@ -35,7 +35,7 @@ class AuthController {
   async getUsers(req, res) {
     try {
       const users = await User.findAll({
-        attributes: ['nome', 'email', 'cargo']
+        attributes: ['use_id', 'email', 'created_at', 'updated_at']
       });
       res.send(users);
     } catch (err) {

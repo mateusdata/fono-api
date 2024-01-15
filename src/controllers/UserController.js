@@ -1,49 +1,66 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const Person = require("../models/Person");
 const EmailController = require("./EmailController");
 const sequelize = require("../config/sequelize");
+const { DataTypes } = require("sequelize");
+const { z, ZodError } = require('zod');
 
-class RegisterController {
-  async createPerson(req, res) {
+class UserController {
+
+  async createUser(req, res) {
+    const userSchema = z.object({
+      first_name: z.string().max(150),
+      password: z.string().max(150),
+      email: z.string().email().max(150),
+    });
+
+    const t = await sequelize.transaction();
+   
     try {
-      const user = await Person.create(req.body);
-      if (user) {
-        return res.status(200).send("Cadastro realizado com sucesso!");
-      }
-      res.status(500).send({ message: "Ocorreu um erro" });
+      const { first_name, password, email } = userSchema.parse(req.body);
+
+      const salt = await bcrypt.genSalt(5);
+      const hash = await bcrypt.hash(password, salt);
+      const user = await User.create({ email: email, password: hash , roles:['doctor']}, { transaction: t });
+
+      const token = jwt.sign({ id_token: user.user_id }, process.env.secretKey, { expiresIn: "20d" });
+      //const sendEmail = await EmailController.welcome(email, first_name);
+
+      await t.commit();
+      return res.send({ token, name: first_name, message: "User has been created" });
     } catch (error) {
-      res.status(500).send({ error: req.body });
-      console.error(error);
+      console.log(error);
+      await t.rollback();
+      return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
   }
 
-  async createUser(req, res) {
-    const { first_name, sur_name, last_name, cpf, birthday, password, email } = req.body;
-    const t = await sequelize.transaction();
-    
-    try {
-      const person = await Person.create({ first_name, sur_name, last_name, cpf, birthday }, { transaction: t });
-      if (person) {
-        console.log(person);
-        console.log("Usuário criado com sucesso");
+  async update(req, res) {
+    const user = await User.findByPk(req.params.id);
+    const { email } = req.body;
 
-      }
-      const salt = await bcrypt.genSalt(5);
-      const hash = await bcrypt.hash(password, salt);
-      const user = await User.create({ per_id: person.per_id, email, password: hash }, { transaction: t });
-      const token = jwt.sign({ id_token: user.user_id }, process.env.secretKey, { expiresIn: "20s" });
-      const sendEmail = await EmailController.welcome(email, first_name);
-      await t.commit();
-      return res.send({ token, name: user.first_name, sendEmail: sendEmail, message: "Usuário cadastrado com sucesso!" });
-    } catch (error) {
-      await t.rollback();
-      console.error(error);
-      return res.status(error?.parent?.code == 23505 ? 409 : 500)?.send({ message: "Ocorreu um erro: ", code: error?.parent?.code });
+    try{
+      user.update({ email });
+
+      return res.send('User has been updated');
+    }catch(error){
+      return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
+  }
+
+  async info(req, res) {
+    const user_id = req.params.id;
+
+    const user = await User.findByPk(user_id, { attributes: ['use_id', 'email', 'created_at', 'updated_at'] });
+
+    if (user) {
+      return res.send(user);
+    }
+    return res.status(500).send({ message: 'User not found' });
   }
 
 }
-module.exports = new RegisterController();
+
+module.exports = new UserController();
 
