@@ -11,7 +11,6 @@ Pacient.init({
     primaryKey: true,
     autoIncrement: true,
   },
-  paranoid: true,
   status: {
     type: DataTypes.STRING(10),
     allowNull: false,

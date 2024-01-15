@@ -1,8 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-const Person = require('./Person');
-const UserHasPerson = require('./PersonHasUser');
-
-const sequelize = require("../config/sequelize")
+const sequelize = require("../config/sequelize");
 
 class User extends Model { }
 
@@ -19,6 +16,10 @@ User.init({
   password: {
     type: DataTypes.CHAR(255),
     allowNull: false,
+  },
+  roles: {
+    type: DataTypes.ARRAY(DataTypes.CHAR(150)),
+    allowNull: false
   },
   recover_password: {
     type: DataTypes.BOOLEAN,
@@ -55,7 +56,5 @@ User.init({
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });
-
-User.belongsToMany(Person, {through: UserHasPerson, foreignKey: 'use_id', otherKey: 'per_id' });
 
 module.exports = User;

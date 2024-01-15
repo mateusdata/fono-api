@@ -13,6 +13,7 @@ Doctor.init({
   },
   gov_license:{
     type: DataTypes.INTEGER,
+    unique: true,
     allowNull: true,
   },
   status: {

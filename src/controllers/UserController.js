@@ -1,44 +1,66 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const Person = require("../models/Person");
 const EmailController = require("./EmailController");
 const sequelize = require("../config/sequelize");
 const { DataTypes } = require("sequelize");
+const { z, ZodError } = require('zod');
 
-class RegisterController {
-  
+class UserController {
+
   async createUser(req, res) {
-    const { first_name, password, email } = req.body;
-    const t = await sequelize.transaction();
+    const userSchema = z.object({
+      first_name: z.string().max(150),
+      password: z.string().max(150),
+      email: z.string().email().max(150),
+    });
 
+    const t = await sequelize.transaction();
+   
     try {
+      const { first_name, password, email } = userSchema.parse(req.body);
 
       const salt = await bcrypt.genSalt(5);
       const hash = await bcrypt.hash(password, salt);
-      const user = await User.create({email: email, password: hash}, { transaction: t });
-      
+      const user = await User.create({ email: email, password: hash , roles:['doctor']}, { transaction: t });
+
       const token = jwt.sign({ id_token: user.user_id }, process.env.secretKey, { expiresIn: "20d" });
       //const sendEmail = await EmailController.welcome(email, first_name);
-      
+
       await t.commit();
-      return res.send({ token, name: first_name, message: "Usuário cadastrado com sucesso!" });
+      return res.send({ token, name: first_name, message: "User has been created" });
     } catch (error) {
+      console.log(error);
       await t.rollback();
-      console.error(error);
-      return res.status(error?.parent?.code == 23505 ? 409 : 500)?.send({ message: "Ocorreu um erro: ", code: error?.parent?.code });
+      return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
   }
 
-  async Info(req, res) {
-    const user_id = req.parameters.user;
+  async update(req, res) {
+    const user = await User.findByPk(req.params.id);
+    const { email } = req.body;
 
-    user = await User.findByPk(user_id);
+    try{
+      user.update({ email });
 
-    return res.send(user);
+      return res.send('User has been updated');
+    }catch(error){
+      return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+    }
+  }
+
+  async info(req, res) {
+    const user_id = req.params.id;
+
+    const user = await User.findByPk(user_id, { attributes: ['use_id', 'email', 'created_at', 'updated_at'] });
+
+    if (user) {
+      return res.send(user);
+    }
+    return res.status(500).send({ message: 'User not found' });
   }
 
 }
 
-module.exports = new RegisterController();
+module.exports = new UserController();
 
