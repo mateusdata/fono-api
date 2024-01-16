@@ -33,6 +33,10 @@ router.post('/create-muscle', MuscleController.create);
 router.get('/info-muscle/:id', MuscleController.info);
 router.post('/update-muscle/:id', MuscleController.update);
 
+router.use('/balba', () => {
+
+});
+
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);
 router.post('/verify-reset-code', PasswordResetController.verifyResetCode);

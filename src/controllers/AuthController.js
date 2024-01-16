@@ -25,6 +25,8 @@ class AuthController {
 
       const isValidUser = await bcrypt.compare(password, user.password);
 
+      console.log(isValidUser);
+      
       if (isValidUser) {
         const token = jwt.sign({ id_token:user.id}, process.env.secretKey, {
           expiresIn: "60s",
