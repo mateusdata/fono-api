@@ -1,11 +1,18 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 const User = require("../models/User");
+const { z, ZodError } = require('zod');
+
 require('dotenv').config();
 
 class AuthController {
   async login(req, res) {
-    const { email, password } = req.body;
+    const loginSchema = z.object({
+      email: z.string().email().max(150),
+      password: z.string().max(50),
+    });
+
+    const { email, password } = loginSchema.parse(req.body);
 
     try {
       const user = await User.findOne({
@@ -15,33 +22,27 @@ class AuthController {
       if (!user) {
         return res.status(400).json({ status: 401, message: "Usuário inexistente" });
       }
+
       const isValidUser = await bcrypt.compare(password, user.password);
+
       if (isValidUser) {
         const token = jwt.sign({ id_token:user.id}, process.env.secretKey, {
           expiresIn: "60s",
         });
         
         return res.send({ token, email:user.email, name: 'mateus'});
+        
       } else {
-        return res.status(400).json({ status: 401, message: "password incorreta"});
+
+        return res.status(400).json({ status: 401, message: "Incorrect email or password"});
+
       }
     } catch (err) {
       console.error(err);
-      res.status(500).send({ error: "Ocorreu um erro no banco de dados." });
+      res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
   }
 
-  async getUsers(req, res) {
-    try {
-      const users = await User.findAll({
-        attributes: ['use_id', 'email', 'created_at', 'updated_at']
-      });
-      res.send(users);
-    } catch (err) {
-      console.error("Erro ao buscar dados de usuário:", err);
-      res.status(500).json({ error: "Erro ao buscar dados de usuário" });
-    }
-  }
   isLogged(req, res) {
     res.send("está logado sim");
   }

@@ -2,11 +2,18 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 const User = require("../models/User");
 const EmailController = require("./EmailController");
+const { z, ZodError } = require('zod');
 require('dotenv').config();
+
 class PasswordResetController {
 
     async sendResetCode(req, res) {
-        const { email } = req.body;
+        const sendSchema = z.object({
+            email: z.string().email(),
+        });
+
+        const { email } = sendSchema.parse(req.body);
+
         try {
             const user = await User.findOne({ where: { email }, attributes: ['email', 'use_id'] });
             if (user) {
@@ -17,11 +24,11 @@ class PasswordResetController {
                     EmailController.sendResetCode(email, code);
                     return res.send(user)
                 }
-                return res.status(400).send({ mensage: "Ocorreu um erro ao enviar  atualizar" })
+                return res.status(400).send({ mensage: "Error while updating" })
             }
-            res.status(400).send({ mensage: "Usuario inexistente" });
+            res.status(400).send({ mensage: "User has not found" });
         } catch (erro) {
-            res.status(500).send({ mensage: "Erro no" });
+            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -29,13 +36,14 @@ class PasswordResetController {
         const { email,verification_code } = req.body;
         try {
             const user = await User.findOne({ where: { email, verification_code }, attributes: ['email', 'use_id', "verification_code", "expiration_date"] });
-            console.log(verification_code == user.verification_code);
+           
             if (user) {
                 return res.send(user)
             }
-            return res.status(400).send({ mensage: "Código invalido " })
+
+            res.status(400).send({ mensage: "Invalid cod" });
         } catch (error) {
-            res.status(500).send({ mensage: "Código invalido" });
+            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
@@ -50,13 +58,13 @@ class PasswordResetController {
                 const updateUser = await User.update({ password: hash }, { where: { use_id: user.use_id } });
                 if (updateUser) {
                     EmailController.passwordChanged(email);
-                    return res.send({ message: "Senha atualizada com sucesso!" });
+                    res.send({ message: "Your password has been updated" });
                 }
-                return res.status(400).send({ message: "Ocorreu um erro ao atualizar a senha" });
+                res.status(400).send({ message: "An error could not be updated" });
             }
-            return res.status(400).send({ message: "User doesn't exists" });
+            res.status(400).send({ message: "User doesn't exists" });
         } catch (error) {
-            res.status(500).send({ message: "Erro no servidor" });
+            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
     

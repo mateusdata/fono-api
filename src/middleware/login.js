@@ -5,7 +5,7 @@ const middlewareUser = (req, res, next) => {
   const tokenHeader = req.header("Authorization");
 
   if (!tokenHeader) {
-    return res.status(403).send("Access Unauthorized");
+    res.status(403).send("Access Unauthorized");
   }
 
   const token = tokenHeader.split(" ")[1];
@@ -25,7 +25,7 @@ const middlewareUser = (req, res, next) => {
 
   } catch {
 
-    return res.status(500).json({ message: "Internal erorr", token });
+    res.status(500).json({ message: "Internal erorr", token });
 
   }
 };
