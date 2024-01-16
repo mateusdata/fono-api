@@ -10,7 +10,6 @@ class MuscleController {
             image_urls: z.array(z.string().url().max(150)).optional()
         })
 
-
         try {
             const muscle = await Muscle.create(createSchema.parse(req.body));
 
@@ -19,7 +18,7 @@ class MuscleController {
             }
 
         } catch (error) {
-
+            console.log(error);
             res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -39,7 +38,7 @@ class MuscleController {
                 return res.status(200).send(muscle);
             }
 
-            return res.status(400).send({ mensage: "Muscl not found" });
+            res.status(400).send({ mensage: "Muscle not found" });
         } catch (error) {
             console.log(error);
             res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -56,7 +55,7 @@ class MuscleController {
                 return res.status(200).send(muscle);
             }
 
-            return res.status(400).send({ mensage: "Muscle not found" });
+            res.status(400).send({ mensage: "Muscle not found" });
         } catch (error) {
 
             res.status(500).send(error instanceof ZodError ? error : 'Server Error');

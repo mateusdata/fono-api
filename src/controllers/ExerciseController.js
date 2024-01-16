@@ -1,5 +1,7 @@
 const Exercise = require("../models/Exercise");
 const { z, ZodError } = require('zod');
+const Muscle = require("../models/Muscle");
+const MuscleHasExercise = require("../models/MuscleHasExercise");
 
 class ExerciseController {
 
@@ -45,9 +47,9 @@ class ExerciseController {
                 return res.status(200).send(exercise);
             }
 
-            return res.status(400).send({ mensage: "Exercise not found" });
+            res.status(400).send({ mensage: "Exercise not found" });
         } catch (error) {
-            console.log(error);
+
             res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -62,7 +64,7 @@ class ExerciseController {
                 return res.status(200).send(exercise);
             }
 
-            return res.status(400).send({ mensage: "Exercise not found" });
+            res.status(400).send({ mensage: "Exercise not found" });
         } catch (error) {
 
             res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -70,6 +72,26 @@ class ExerciseController {
 
     }
 
+    async linkExerciseToMuscle(req, res) {
+        const linkSchema = z.object({
+            mus_id: z.number().int().positive(),
+            exe_id: z.number().int().positive()
+        });
+
+        try {
+            const { mus_id, exe_id } = linkSchema.parse(req.body);
+            const link = MuscleHasExercise.create({ mus_id, exe_id });
+
+            if(link){
+                return res.status(200).send({message: "Exercise attributed successfuly"});
+            }
+
+            res.status(200).send({message: "Could not attibute exercise to muscle"});
+        } catch (error) {
+            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
+
+    }
 }
 
 module.exports = new ExerciseController();

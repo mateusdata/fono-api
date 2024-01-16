@@ -41,8 +41,8 @@ class PersonController {
 
     async create(req, res) {
         const PersonSchema = z.object({
-            first_name: z.string().length(150),
-            last_name: z.string().length(150),
+            first_name: z.string().max(150),
+            last_name: z.string().max(150),
             cpf: z.string().length(11)/*.refine(cpfValidation, { message: "Invalid cpf number" })*/,
             birthday: z.string().max(25)//.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/
         });
@@ -62,7 +62,7 @@ class PersonController {
             res.status(200).send(await UserHasPerson.create({ use_id, per_id }));
         } catch (erro) {
             console.log(erro);
-            res.status(500).send({ mensage: "Error on server" });
+            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
@@ -73,12 +73,15 @@ class PersonController {
 
             if (person) {
                 const users = await person.getUsers({ attributes: ['use_id', 'email', 'created_at', 'updated_at'] });
-                return res.send({ person: person, users: users })
+                
+                return res.send({ person: person, users: users });
             }
-            return res.status(400).send({ mensage: "Person not found" })
+
+            res.status(400).send({ mensage: "Person not found" });
+
         } catch (error) {
-            console.log(error);
-            res.status(500).send({ mensage: "Server error" });
+
+            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }

@@ -9,6 +9,7 @@ const middlewareUser = require('../middleware/login');
 const AuthController = require('../controllers/AuthController');
 const PasswordResetController = require('../controllers/PasswordResetController');
 const ExerciseController = require('../controllers/ExerciseController');
+const MuscleController = require('../controllers/MuscleController');
 
 
 router.post('/create-user', UserController.createUser);
@@ -26,6 +27,15 @@ router.post('/update-doctor/:id', DoctorController.update);
 router.post('/create-exercise', ExerciseController.create);
 router.get('/info-exercise/:id', ExerciseController.info);
 router.post('/update-exercise/:id', ExerciseController.update);
+router.post('/link-exercise-to-muscle', ExerciseController.linkExerciseToMuscle);
+
+router.post('/create-muscle', MuscleController.create);
+router.get('/info-muscle/:id', MuscleController.info);
+router.post('/update-muscle/:id', MuscleController.update);
+
+router.use('/balba', () => {
+
+});
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);
