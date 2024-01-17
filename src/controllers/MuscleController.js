@@ -19,7 +19,7 @@ class MuscleController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -38,10 +38,10 @@ class MuscleController {
                 return res.status(200).send(muscle);
             }
 
-            res.status(400).send({ mensage: "Muscle not found" });
+          return res.status(400).send({ mensage: "Muscle not found" });
         } catch (error) {
             console.log(error);
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -55,10 +55,10 @@ class MuscleController {
                 return res.status(200).send(muscle);
             }
 
-            res.status(400).send({ mensage: "Muscle not found" });
+          return res.status(400).send({ mensage: "Muscle not found" });
         } catch (error) {
 
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }

@@ -9,10 +9,10 @@ class DoctorController {
 
         try {
             const { gov_license } = createSchema.parse(req.body);
-            res.status(200).send(await Doctor.create({ gov_license }));
+            return res.status(200).send(await Doctor.create({ gov_license }));
         } catch (erro) {
 
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -26,9 +26,9 @@ class DoctorController {
                 return res.send(doctor)
             }
 
-            res.status(404).send({ mensage: "Doctor not found" })
+            return res.status(404).send({ mensage: "Doctor not found" })
         } catch (error) {
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
@@ -47,9 +47,9 @@ class DoctorController {
                 return res.send(doctor)
             }
 
-            res.status(400).send({ mensage: "Doctor not found" })
+            return res.status(400).send({ mensage: "Doctor not found" })
         } catch (error) {
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
