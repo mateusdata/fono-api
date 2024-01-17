@@ -55,7 +55,7 @@ class UserController {
     const user = await User.findByPk(user_id, { attributes: ['use_id', 'email', 'created_at', 'updated_at'] });
 
     if (user) {
-      return res.status.send(user);
+      return res.status(200).send(user);
     }
 
     return res.status(500).send({ message: 'User not found' });

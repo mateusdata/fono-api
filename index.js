@@ -19,7 +19,7 @@ app.use("/", AuthRouter);
 app.use("/", ApiRouter);
 
 app.get("/", async function (req, res) {
-  res.send({ projeto: "API fonoapp"});
+  res.send({ projeto: "Fono App api v1"});
 });
 
 app.listen(port, () => {

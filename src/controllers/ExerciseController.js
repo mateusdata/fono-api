@@ -1,6 +1,5 @@
 const Exercise = require("../models/Exercise");
 const { z, ZodError } = require('zod');
-const Muscle = require("../models/Muscle");
 const MuscleHasExercise = require("../models/MuscleHasExercise");
 
 class ExerciseController {
@@ -8,7 +7,7 @@ class ExerciseController {
     async create(req, res) {
         const createSchema = z.object({
             name: z.string().max(150),
-            status: z.string().max(150),
+            status: z.string().max(150).optional(),
             description: z.string().max(250),
             video_urls: z.array(z.string().url().max(150)),
             academic_sources: z.array(z.string().max(150))
@@ -24,14 +23,13 @@ class ExerciseController {
             }
 
         } catch (error) {
-
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
     async update(req, res) {
         const updateSchema = z.object({
-            id: z.string(),
             name: z.string().max(150).optional(),
             status: z.string().max(150).optional(),
             description: z.string().max(250).optional(),
