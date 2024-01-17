@@ -32,7 +32,7 @@ class UserController {
     } catch (error) {
       console.log(error);
       await t.rollback();
-      res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+      return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
   }
 
@@ -43,9 +43,9 @@ class UserController {
     try {
       user.update({ email });
 
-      res.send('User has been updated');
+      return res.statu(200).send('User has been updated');
     } catch (error) {
-      res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+      return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
   }
 
@@ -55,10 +55,10 @@ class UserController {
     const user = await User.findByPk(user_id, { attributes: ['use_id', 'email', 'created_at', 'updated_at'] });
 
     if (user) {
-      res.send(user);
+      return res.status.send(user);
     }
-    
-    res.status(500).send({ message: 'User not found' });
+
+    return res.status(500).send({ message: 'User not found' });
   }
 
 }

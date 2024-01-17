@@ -48,10 +48,10 @@ class PersonController {
         });
 
         try {
-            res.status(200).send(await Person.create(PersonSchema.parse(req.body)));
+          return res.status(200).send(await Person.create(PersonSchema.parse(req.body)));
         } catch (error) {
             console.log(error)
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -59,10 +59,10 @@ class PersonController {
         const { use_id, per_id } = req.body
 
         try {
-            res.status(200).send(await UserHasPerson.create({ use_id, per_id }));
+          return res.status(200).send(await UserHasPerson.create({ use_id, per_id }));
         } catch (erro) {
             console.log(erro);
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
@@ -77,11 +77,11 @@ class PersonController {
                 return res.send({ person: person, users: users });
             }
 
-            res.status(400).send({ mensage: "Person not found" });
+          return res.status(400).send({ mensage: "Person not found" });
 
         } catch (error) {
 
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }

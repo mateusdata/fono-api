@@ -26,9 +26,9 @@ class PasswordResetController {
                 }
                 return res.status(400).send({ mensage: "Error while updating" })
             }
-            res.status(400).send({ mensage: "User has not found" });
+          return res.status(400).send({ mensage: "User has not found" });
         } catch (erro) {
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -41,9 +41,9 @@ class PasswordResetController {
                 return res.send(user)
             }
 
-            res.status(400).send({ mensage: "Invalid cod" });
+          return res.status(400).send({ mensage: "Invalid cod" });
         } catch (error) {
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
@@ -60,11 +60,11 @@ class PasswordResetController {
                     EmailController.passwordChanged(email);
                     res.send({ message: "Your password has been updated" });
                 }
-                res.status(400).send({ message: "An error could not be updated" });
+              return res.status(400).send({ message: "An error could not be updated" });
             }
-            res.status(400).send({ message: "User doesn't exists" });
+          return res.status(400).send({ message: "User doesn't exists" });
         } catch (error) {
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
     

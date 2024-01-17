@@ -5,7 +5,7 @@ const middlewareUser = (req, res, next) => {
   const tokenHeader = req.header("Authorization");
 
   if (!tokenHeader) {
-    res.status(403).send("Access Unauthorized");
+    return res.status(403).send("Access Unauthorized");
   }
 
   const token = tokenHeader.split(" ")[1];
@@ -13,7 +13,7 @@ const middlewareUser = (req, res, next) => {
   try {
 
     jwt.verify(token, process.env.secretKey, (err, decode) => {
-      
+
       if (err) {
         return res.status(401).json({ message: "Token is invalid or expired" });
       }
@@ -25,8 +25,7 @@ const middlewareUser = (req, res, next) => {
 
   } catch {
 
-    res.status(500).json({ message: "Internal erorr", token });
-
+    return res.status(500).json({ message: "Internal erorr", token });
   }
 };
 

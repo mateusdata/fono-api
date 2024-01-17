@@ -41,7 +41,7 @@ class AuthController {
       }
     } catch (err) {
       console.error(err);
-      res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+      return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
   }
 

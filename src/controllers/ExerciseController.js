@@ -25,7 +25,7 @@ class ExerciseController {
 
         } catch (error) {
 
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -47,10 +47,10 @@ class ExerciseController {
                 return res.status(200).send(exercise);
             }
 
-            res.status(400).send({ mensage: "Exercise not found" });
+            return res.status(400).send({ mensage: "Exercise not found" });
         } catch (error) {
 
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -64,10 +64,10 @@ class ExerciseController {
                 return res.status(200).send(exercise);
             }
 
-            res.status(400).send({ mensage: "Exercise not found" });
+            return res.status(400).send({ mensage: "Exercise not found" });
         } catch (error) {
 
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
@@ -86,9 +86,9 @@ class ExerciseController {
                 return res.status(200).send({message: "Exercise attributed successfuly"});
             }
 
-            res.status(200).send({message: "Could not attibute exercise to muscle"});
+            return res.status(200).send({message: "Could not attibute exercise to muscle"});
         } catch (error) {
-            res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
