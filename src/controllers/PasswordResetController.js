@@ -9,7 +9,7 @@ class PasswordResetController {
 
     async sendResetCode(req, res) {
         const sendSchema = z.object({
-            email: z.string().email(),
+          email: z.string().email().max(150),
         });
 
         const { email } = sendSchema.parse(req.body);
