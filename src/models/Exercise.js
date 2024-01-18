@@ -25,16 +25,16 @@ Exercise.init({
         }
     },
     video_urls: {
-        type: DataTypes.ARRAY(DataTypes.CHAR),
+        type: DataTypes.ARRAY(DataTypes.STRING(150)),
         allowNull: true
     },
     academic_sources:{
-        type: DataTypes.ARRAY(DataTypes.CHAR),
+        type: DataTypes.ARRAY(DataTypes.STRING(150)),
         allowNull: false,
     },
     created_at: {
         type: DataTypes.DATE,
-        allowNull: true,
+        allowNull: false,
     },
     updated_at: {
         type: DataTypes.DATE,

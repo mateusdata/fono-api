@@ -1,34 +1,34 @@
-const  { Model, DataTypes } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 const sequelize = require("../config/sequelize");
 const Exercise = require("./Exercise");
 
-class ExercisePlan extends Model {}
+class ExercisePlan extends Model { }
 
 ExercisePlan.init({
-    exp_id:{
+    exp_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },
-    exe_id:{
+    exe_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references:{
+        references: {
             model: "Exercise",
             key: "exe_id"
         }
     },
-    repetitions:{
+    repetitions: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    series:{
+    series: {
         type: DataTypes.INTEGER,
-        allowNull:false
+        allowNull: false
     },
     created_at: {
         type: DataTypes.DATE,
-        allowNull: true,
+        allowNull: false,
     },
     updated_at: {
         type: DataTypes.DATE,
@@ -43,7 +43,7 @@ ExercisePlan.init({
     updatedAt: 'updated_at'
 });
 
-ExercisePlan.hasOne(Exercise);
-Exercise.belongsTo(ExercisePlan);
+ExercisePlan.hasOne(Exercise, { foreignKey: 'exe_id' });
+Exercise.belongsTo(ExercisePlan, { foreignKey: 'exe_id' });
 
 module.exports = ExercisePlan;

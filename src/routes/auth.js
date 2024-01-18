@@ -11,6 +11,7 @@ const PasswordResetController = require('../controllers/PasswordResetController'
 const ExerciseController = require('../controllers/ExerciseController');
 const MuscleController = require('../controllers/MuscleController');
 const ExercisePlanController = require('../controllers/ExercisePlanController');
+const ProtocolController = require('../controllers/ProtocolController');
 
 
 router.post('/create-user', UserController.createUser);
@@ -37,6 +38,10 @@ router.post('/update-muscle/:id', MuscleController.update);
 router.post('/create-exercise-plan', ExercisePlanController.create);
 router.get('/info-exercise-plan/:id', ExercisePlanController.info);
 router.post('/update-exercise-plan/:id', ExercisePlanController.update);
+
+router.post('/create-protocol', ProtocolController.create);
+router.get('/info-protocol/:id', ProtocolController.info);
+router.post('/update-protocol/:id', ProtocolController.update);
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);

@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const EmailController = require("./EmailController");
 const sequelize = require("../config/sequelize");
-const { DataTypes } = require("sequelize");
 const { z, ZodError } = require('zod');
 
 class UserController {
@@ -28,7 +27,7 @@ class UserController {
       //const sendEmail = await EmailController.welcome(email, first_name);
 
       await t.commit();
-      res.send({ token, name: first_name, message: "User has been created" });
+      return res.send({ token, name: first_name, message: "User has been created" });
     } catch (error) {
       console.log(error);
       await t.rollback();

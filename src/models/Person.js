@@ -30,7 +30,7 @@ Person.init({
   },
   created_at: {
     type: DataTypes.DATE,
-    allowNull: true,
+    allowNull: false,
   },
   updated_at: {
     type: DataTypes.DATE,

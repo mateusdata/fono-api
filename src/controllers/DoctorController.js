@@ -1,5 +1,5 @@
 const Doctor = require("../models/Doctor");
-const { z } = require("zod");
+const { z, ZodError} = require("zod");
 class DoctorController {
 
     async create(req, res) {
@@ -10,9 +10,9 @@ class DoctorController {
         try {
             const { gov_license } = createSchema.parse(req.body);
             return res.status(200).send(await Doctor.create({ gov_license }));
-        } catch (erro) {
+        } catch (error) {
 
-          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 

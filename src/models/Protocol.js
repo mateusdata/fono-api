@@ -1,23 +1,28 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require("../config/sequelize");
 
-const Exercise = require('./Exercise');
-const MuscleHasExercise = require('./MuscleHasExercise');
+class Protocol extends Model { }
 
-class Muscle extends Model { }
-
-Muscle.init({
-    mus_id: {
+Protocol.init({
+    pro_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
+    },
+    doc_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: "Doctor",
+            key: "doc_id"
+        }
     },
     name: {
         type: DataTypes.STRING(150),
         allowNull: false,
     },
-    latin_name: {
-        type: DataTypes.STRING(150),
+    description: {
+        type: DataTypes.TEXT,
         allowNull: true,
     },
     status: {
@@ -26,10 +31,6 @@ Muscle.init({
         validate: {
             isIn: [['active', 'banned', 'inactive']]
         }
-    },
-    image_urls: {
-        type: DataTypes.ARRAY(DataTypes.STRING(150)),
-        allowNull: true
     },
     created_at: {
         type: DataTypes.DATE,
@@ -41,14 +42,11 @@ Muscle.init({
     },
 }, {
     sequelize,
-    modelName: 'Muscle',
-    tableName: 'muscle',
+    modelName: 'Protocol',
+    tableName: 'protocol',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    updatedAt: 'updated_at',
 });
 
-Muscle.belongsToMany(Exercise, {through: MuscleHasExercise, foreignKey: 'mus_id', otherKey: 'exe_id' });
-Exercise.belongsToMany(Muscle, {through: MuscleHasExercise, foreignKey: 'exe_id', otherKey: 'mus_id' });
-
-module.exports = Muscle;
+module.exports = Protocol;

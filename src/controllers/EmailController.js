@@ -30,7 +30,7 @@ class EmailController {
     }
   }
 
-  async sendResetCode(email,code){
+  async sendResetCode(email, code) {
 
     if (email) {
       sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -53,7 +53,7 @@ class EmailController {
 
   }
 
-  async passwordChanged(email){
+  async passwordChanged(email) {
 
     if (email) {
       sgMail.setApiKey(process.env.SENDGRID_API_KEY);

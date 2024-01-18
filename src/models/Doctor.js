@@ -1,7 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-require('dotenv').config();
-
-const sequelize = require("../config/sequelize")
+const sequelize = require("../config/sequelize");
 
 class Doctor extends Model {}
 
@@ -26,7 +24,7 @@ Doctor.init({
   },
   created_at: {
     type: DataTypes.DATE,
-    allowNull: true,
+    allowNull: false,
   },
   updated_at: {
     type: DataTypes.DATE,

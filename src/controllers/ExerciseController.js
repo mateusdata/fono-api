@@ -48,7 +48,7 @@ class ExerciseController {
             return res.status(400).send({ mensage: "Exercise not found" });
         } catch (error) {
 
-          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -65,7 +65,7 @@ class ExerciseController {
             return res.status(400).send({ mensage: "Exercise not found" });
         } catch (error) {
 
-          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
@@ -80,11 +80,11 @@ class ExerciseController {
             const { mus_id, exe_id } = linkSchema.parse(req.body);
             const link = MuscleHasExercise.create({ mus_id, exe_id });
 
-            if(link){
-                return res.status(200).send({message: "Exercise attributed successfuly"});
+            if (link) {
+                return res.status(200).send({ message: "Exercise attributed successfuly" });
             }
 
-            return res.status(200).send({message: "Could not attibute exercise to muscle"});
+            return res.status(200).send({ message: "Could not attibute exercise to muscle" });
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }

@@ -1,6 +1,6 @@
 const Person = require("../models/Person");
 const UserHasPerson = require("../models/PersonHasUser");
-const {z , ZodError } = require('zod');
+const { z, ZodError } = require('zod');
 const dayjs = require('dayjs');
 
 const cpfValidation = (cpf) => {
@@ -48,10 +48,10 @@ class PersonController {
         });
 
         try {
-          return res.status(200).send(await Person.create(PersonSchema.parse(req.body)));
+            return res.status(200).send(await Person.create(PersonSchema.parse(req.body)));
         } catch (error) {
             console.log(error)
-          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
@@ -59,10 +59,10 @@ class PersonController {
         const { use_id, per_id } = req.body
 
         try {
-          return res.status(200).send(await UserHasPerson.create({ use_id, per_id }));
-        } catch (erro) {
-            console.log(erro);
-          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(200).send(await UserHasPerson.create({ use_id, per_id }));
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
@@ -73,15 +73,15 @@ class PersonController {
 
             if (person) {
                 const users = await person.getUsers({ attributes: ['use_id', 'email', 'created_at', 'updated_at'] });
-                
+
                 return res.send({ person: person, users: users });
             }
 
-          return res.status(400).send({ mensage: "Person not found" });
+            return res.status(404).send({ mensage: "Person not found" });
 
         } catch (error) {
 
-          return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
