@@ -1,6 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require("../config/sequelize");
-const Exercise = require("./Exercise");
+const sequelize = require('../config/sequelize');
+const Exercise = require('./Exercise');
 
 class ExercisePlan extends Model { }
 
@@ -14,8 +14,8 @@ ExercisePlan.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: "Exercise",
-            key: "exe_id"
+            model: 'Exercise',
+            key: 'exe_id'
         }
     },
     repetitions: {
@@ -36,14 +36,14 @@ ExercisePlan.init({
     },
 }, {
     sequelize,
-    modelName: 'ExercisePlan',
+    modelName: 'exercise_plan',
     tableName: 'exercise_plan',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-ExercisePlan.hasOne(Exercise, { foreignKey: 'exe_id' });
-Exercise.belongsTo(ExercisePlan, { foreignKey: 'exe_id' });
+ExercisePlan.hasOne(Exercise, { sourceKey: 'exe_id', foreignKey: 'exe_id' });
+Exercise.belongsToMany(ExercisePlan, { through: ExercisePlan, foreignKey: 'exe_id', otherKey: 'exe_id' });
 
 module.exports = ExercisePlan;

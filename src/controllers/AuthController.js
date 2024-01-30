@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const User = require("../models/User");
+const User = require('../models/User');
 const { z, ZodError } = require('zod');
 
 require('dotenv').config();
@@ -9,7 +9,7 @@ class AuthController {
   async login(req, res) {
     const loginSchema = z.object({
       email: z.string().email().max(150),
-      password: z.string().max(50),
+      password: z.string().maxLength(50),
     });
 
 
@@ -21,7 +21,7 @@ class AuthController {
       });
 
       if (!user) {
-        return res.status(400).json({ status: 401, message: "Usuário inexistente" });
+        return res.status(400).json({ status: 401, message: 'User doesn\'t exists' });
       }
 
       const isValidUser = await bcrypt.compare(password, user.password);
@@ -30,16 +30,15 @@ class AuthController {
 
       if (isValidUser) {
         const token = jwt.sign({ id_token: user.id }, process.env.secretKey, {
-          expiresIn: "60s",
+          expiresIn: '60s',
         });
 
         return res.send({ token, email: user.email, name: 'mateus' });
 
-      } else {
+      } 
+        
+      return res.status(400).json({ status: 401, message: 'Incorrect email or password' });
 
-        return res.status(400).json({ status: 401, message: "Incorrect email or password" });
-
-      }
     } catch (error) {
 
       return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -47,7 +46,7 @@ class AuthController {
   }
 
   isLogged(req, res) {
-    res.send("está logado sim");
+    res.send('está logado sim');
   }
 }
 

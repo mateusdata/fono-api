@@ -1,7 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-require('dotenv').config();
-
-const sequelize = require("../config/sequelize")
+const sequelize = require('../config/sequelize')
 
 class Pacient extends Model {}
 
@@ -12,12 +10,9 @@ Pacient.init({
     autoIncrement: true,
   },
   status: {
-    type: DataTypes.STRING(10),
-    allowNull: false,
+    type: DataTypes.ENUM,
     defaultValue: 'active',
-    validate: {
-      isIn: [['active', 'banned', 'inactive']]
-    }
+    values: ['active', 'banned', 'inactive']
   },
   created_at: {
     type: DataTypes.DATE,
@@ -29,7 +24,7 @@ Pacient.init({
   },
 }, {
   sequelize,
-  modelName: 'Pacient',
+  modelName: 'pacient',
   tableName: 'pacient',
   timestamps: true,
   createdAt: 'created_at',

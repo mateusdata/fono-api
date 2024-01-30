@@ -1,9 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require("../config/sequelize");
-const User = require('./User');
-const PersonHasUser = require('./PersonHasUser');
+const sequelize = require('../config/sequelize');
 
-class Person extends Model {}
+class Person extends Model { }
 
 Person.init({
   per_id: {
@@ -22,7 +20,7 @@ Person.init({
   cpf: {
     type: DataTypes.STRING(11),
     allowNull: false,
-    unique:true
+    unique: true
   },
   birthday: {
     type: DataTypes.DATE,
@@ -38,14 +36,12 @@ Person.init({
   },
 }, {
   sequelize,
-  modelName: 'Person',
+  modelName: 'person',
   tableName: 'person',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 });
 
-User.belongsToMany(Person, {through: PersonHasUser, foreignKey: 'use_id', otherKey: 'per_id' });
-Person.belongsToMany(User, {through: PersonHasUser, foreignKey: 'per_id', otherKey: 'use_id' });
 
-module.exports =  Person;
+module.exports = Person;

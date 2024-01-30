@@ -1,5 +1,5 @@
-const Person = require("../models/Person");
-const UserHasPerson = require("../models/PersonHasUser");
+const Person = require('../models/Person');
+const UserHasPerson = require('../models/PersonHasUser');
 const { z, ZodError } = require('zod');
 const dayjs = require('dayjs');
 
@@ -41,10 +41,10 @@ class PersonController {
 
     async create(req, res) {
         const PersonSchema = z.object({
-            first_name: z.string().max(150),
-            last_name: z.string().max(150),
-            cpf: z.string().length(11)/*.refine(cpfValidation, { message: "Invalid cpf number" })*/,
-            birthday: z.string().max(25)//.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/
+            first_name: z.string().maxLength(150),
+            last_name: z.string().maxLength(150),
+            cpf: z.string().length(11)/*.refine(cpfValidation, { message: 'Invalid cpf number' })*/,
+            birthday: z.string().maxLength(25)//.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/
         });
 
         try {
@@ -77,7 +77,7 @@ class PersonController {
                 return res.send({ person: person, users: users });
             }
 
-            return res.status(404).send({ mensage: "Person not found" });
+            return res.status(404).send({ mensage: 'Person not found' });
 
         } catch (error) {
 

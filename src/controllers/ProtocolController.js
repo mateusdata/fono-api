@@ -1,12 +1,16 @@
-const { z, ZodError } = require("zod");
-const Protocol = require("../models/Protocol");
+const { z, ZodError } = require('zod');
+const Protocol = require('../models/Protocol');
+const ProtocolHasExercisePlan = require('../models/ProtocolHasExercisePlan');
+const Exercise = require('../models/Exercise');
+const ExercisePlan = require('../models/ExercisePlan');
 
 class ProtocolController {
     async create(req, res) {
         const createSchema = z.object({
-            doc_id: z.number().int().positive().optional(),
-            name: z.string().max(150),
-            description: z.string().max(255),
+            doc_id: z.number().int().positive(),
+            name: z.string().maxLength(150),
+            description: z.string().maxLength(255),
+            type: z.enum(['layout', 'prescription']),
         });
 
         try {
@@ -16,31 +20,39 @@ class ProtocolController {
                 return res.status(200).send(protocol);
             }
 
-            return res.status(400).send("Protocol could not be created");
+            return res.status(400).send('Protocol could not be created');
         } catch (error) {
-            return res.status(500).send(error instanceof ZodError ? error : "Server Error");
+            console.log(error);
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
     async info(req, res) {
 
         try {
-            const protocol = await Protocol.findByPk(req.params.id);
+            const protocol = await Protocol.findByPk(req.params.id, {
+                include: {
+                    model: ExercisePlan,
+                    include: Exercise
+                }
+            });
 
             if (protocol) {
+
                 return res.status(200).send(protocol);
             }
 
-            return res.status(404).send({ message: "Protocol not found" });
+            return res.status(404).send({ message: 'Protocol not found' });
         } catch (error) {
-            return res.status(500).send(error instanceof ZodError ? error : "Server Error");
+            console.log(error);
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
-    
+
     async update(req, res) {
         const updateSchema = z.object({
-            name: z.string().max(150).optional(),
-            description: z.string().max(255).optional(),
+            name: z.string().maxLength(150).optional(),
+            description: z.string().maxLength(255).optional(),
         });
 
         try {
@@ -52,13 +64,13 @@ class ProtocolController {
                 return res.status(200).send(protocol);
             }
 
-            return res.status(422).send({ message: "Protocol could not be updated" });
+            return res.status(422).send({ message: 'Protocol could not be updated' });
         } catch (error) {
-            return res.status(500).send(error instanceof ZodError ? error : "Server Error");
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
-    
+
 }
 
 module.exports = new ProtocolController();

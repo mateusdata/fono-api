@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require("../config/sequelize");
+const sequelize = require('../config/sequelize');
 
 class Doctor extends Model {}
 
@@ -19,7 +19,7 @@ Doctor.init({
     allowNull: false,
     defaultValue: 'active',
     validate: {
-      isIn: [['active', 'banned', 'inactive']]
+      isIn: ['active', 'banned', 'inactive']
     }
   },
   created_at: {
@@ -32,7 +32,7 @@ Doctor.init({
   },
 }, {
   sequelize,
-  modelName: 'Doctor',
+  modelName: 'doctor',
   tableName: 'doctor',
   timestamps: true,
   createdAt: 'created_at',

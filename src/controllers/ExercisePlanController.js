@@ -1,23 +1,27 @@
-const ExercisePlan = require("../models/ExercisePlan");
+const Exercise = require('../models/Exercise');
+const ExercisePlan = require('../models/ExercisePlan');
 const { z, ZodError } = require('zod');
 
 class ExercisePlanController {
 
     async create(req, res) {
         const createSchema = z.object({
-            exe_id: z.number().int().optional(),
+            exe_id: z.number().int().positive(),
+            pro_id: z.number().int().positive().optional(),
             repetitions: z.number().int().positive(),
             series: z.number().int().positive(),
         });
 
         try {
             const exercise_plan = await ExercisePlan.create(createSchema.parse(req.body));
+
             if (exercise_plan) {
                 return res.status(200).send(exercise_plan);
             }
 
-            return res.status(403).send({ message: "Exercise plan could not be created" });
+            return res.status(403).send({ message: 'Exercise plan could not be created' });
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -35,7 +39,7 @@ class ExercisePlanController {
                 return res.status(200).send(exercise_plan);
             }
 
-            return res.status(403).send({ message: "Exercise plan could not be update" });
+            return res.status(403).send({ message: 'Exercise plan could not be update' });
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
@@ -44,13 +48,17 @@ class ExercisePlanController {
     async info(req, res) {
 
         try {
-            const exercise_plan = await ExercisePlan.findByPk(req.params.id);
+            const exercise_plan = await ExercisePlan.findByPk(req.params.id, {
+                include:{
+                    model: Exercise,
+                }
+            });
 
             if (exercise_plan) {
                 return res.status(200).send(exercise_plan);
             }
 
-            return res.status(403).send({ message: "Exercise plan could not be found" });
+            return res.status(403).send({ message: 'Exercise plan could not be found' });
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }

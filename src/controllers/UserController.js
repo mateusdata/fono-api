@@ -1,16 +1,16 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const EmailController = require("./EmailController");
-const sequelize = require("../config/sequelize");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const EmailController = require('./EmailController');
+const sequelize = require('../config/sequelize');
 const { z, ZodError } = require('zod');
 
 class UserController {
 
   async createUser(req, res) {
     const userSchema = z.object({
-      first_name: z.string().max(150),
-      password: z.string().max(150),
+      first_name: z.string().maxLength(150),
+      password: z.string().maxLength(150),
       email: z.string().email().max(150),
     });
 
@@ -23,11 +23,11 @@ class UserController {
       const hash = await bcrypt.hash(password, salt);
       const user = await User.create({ email: email, password: hash, roles: ['doctor'] }, { transaction: t });
 
-      const token = jwt.sign({ id_token: user.user_id }, process.env.secretKey, { expiresIn: "20d" });
+      const token = jwt.sign({ id_token: user.user_id }, process.env.secretKey, { expiresIn: '20d' });
       //const sendEmail = await EmailController.welcome(email, first_name);
 
       await t.commit();
-      return res.send({ token, name: first_name, message: "User has been created" });
+      return res.send({ token, name: first_name, message: 'User has been created' });
     } catch (error) {
       console.log(error);
       await t.rollback();

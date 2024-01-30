@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require("../config/sequelize");
+const sequelize = require('../config/sequelize');
+const Doctor = require('./Doctor');
 
 class Protocol extends Model { }
 
@@ -13,24 +14,28 @@ Protocol.init({
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-            model: "Doctor",
-            key: "doc_id"
+            model: Doctor,
+            key: 'doc_id'
         }
     },
     name: {
         type: DataTypes.STRING(150),
         allowNull: false,
     },
+    type: {
+        type: DataTypes.ENUM,
+        allowNull: false,
+        values: ['layout', 'prescription'],
+        defaultValue: 'layout',
+    },
     description: {
         type: DataTypes.TEXT,
         allowNull: true,
     },
     status: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.ENUM,
         defaultValue: 'active',
-        validate: {
-            isIn: [['active', 'banned', 'inactive']]
-        }
+        values: ['active', 'banned', 'inactive']
     },
     created_at: {
         type: DataTypes.DATE,
@@ -42,7 +47,7 @@ Protocol.init({
     },
 }, {
     sequelize,
-    modelName: 'Protocol',
+    modelName: 'protocol',
     tableName: 'protocol',
     timestamps: true,
     createdAt: 'created_at',

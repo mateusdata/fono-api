@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const User = require("../models/User");
-const EmailController = require("./EmailController");
+const User = require('../models/User');
+const EmailController = require('./EmailController');
 const { z, ZodError } = require('zod');
 require('dotenv').config();
 
@@ -28,10 +28,10 @@ class PasswordResetController {
           return res.send(user);
         }
 
-        return res.status(400).send({ mensage: "Error while updating" })
+        return res.status(400).send({ mensage: 'Error while updating' })
       }
 
-      return res.status(404).send({ mensage: "User has not found" });
+      return res.status(404).send({ mensage: 'User has not found' });
     } catch (error) {
 
       return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -42,13 +42,13 @@ class PasswordResetController {
     const { email, verification_code } = req.body;
 
     try {
-      const user = await User.findOne({ where: { email, verification_code }, attributes: ['email', 'use_id', "verification_code", "expiration_date"] });
+      const user = await User.findOne({ where: { email, verification_code }, attributes: ['email', 'use_id', 'verification_code', 'expiration_date'] });
 
       if (user) {
         return res.send(user)
       }
 
-      return res.status(400).send({ mensage: "Invalid cod" });
+      return res.status(400).send({ mensage: 'Invalid cod' });
     } catch (error) {
 
       return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -59,7 +59,7 @@ class PasswordResetController {
   async resetPassword(req, res) {
     const resetSchema = z.object({
       email: z.string().email().max(150),
-      newPassword: z.string().max(50)
+      newPassword: z.string().maxLength(50)
     });
 
 
@@ -77,14 +77,14 @@ class PasswordResetController {
         if (updateUser) {
 
           EmailController.passwordChanged(email);
-          res.send({ message: "Your password has been updated" });
+          res.send({ message: 'Your password has been updated' });
 
         }
 
-        return res.status(400).send({ message: "An error could not be updated" });
+        return res.status(400).send({ message: 'An error could not be updated' });
       }
 
-      return res.status(400).send({ message: "User doesn't exists" });
+      return res.status(400).send({ message: 'User doesn\'t exists' });
 
     } catch (error) {
 

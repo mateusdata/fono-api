@@ -1,8 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require("../config/sequelize");
-
-const Exercise = require('./Exercise');
-const MuscleHasExercise = require('./MuscleHasExercise');
+const sequelize = require('../config/sequelize');
 
 class Muscle extends Model { }
 
@@ -21,11 +18,9 @@ Muscle.init({
         allowNull: true,
     },
     status: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.ENUM,
         defaultValue: 'active',
-        validate: {
-            isIn: [['active', 'banned', 'inactive']]
-        }
+        values: ['active', 'banned', 'inactive']
     },
     image_urls: {
         type: DataTypes.ARRAY(DataTypes.STRING(150)),
@@ -41,14 +36,12 @@ Muscle.init({
     },
 }, {
     sequelize,
-    modelName: 'Muscle',
+    modelName: 'muscle',
     tableName: 'muscle',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
 });
 
-Muscle.belongsToMany(Exercise, {through: MuscleHasExercise, foreignKey: 'mus_id', otherKey: 'exe_id' });
-Exercise.belongsToMany(Muscle, {through: MuscleHasExercise, foreignKey: 'exe_id', otherKey: 'mus_id' });
 
 module.exports = Muscle;

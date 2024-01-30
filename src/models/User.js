@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require("../config/sequelize");
+const sequelize = require('../config/sequelize');
 
 class User extends Model { }
 
@@ -34,11 +34,9 @@ User.init({
     allowNull: true,
   },
   status: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.ENUM,
     defaultValue: 'active',
-    validate: {
-      isIn: [['active', 'banned', 'inactive']]
-    }
+    values: ['active', 'banned', 'inactive']
   },
   created_at: {
     type: DataTypes.DATE,
@@ -50,7 +48,7 @@ User.init({
   },
 }, {
   sequelize,
-  modelName: 'User',
+  modelName: 'user',
   tableName: 'user',
   timestamps: true,
   createdAt: 'created_at',

@@ -1,10 +1,10 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-const sgMail = require("@sendgrid/mail");
-const welcome = require("../template/welcome.js")
-const sendCode = require("../template/sendCode.js")
-const chagedPassword = require("../template/passwordChange.js")
+const sgMail = require('@sendgrid/mail');
+const welcome = require('../template/welcome.js')
+const sendCode = require('../template/sendCode.js')
+const chagedPassword = require('../template/passwordChange.js')
 
 class EmailController {
 
@@ -16,8 +16,8 @@ class EmailController {
       const msg = {
         to: email,
         from: { email: 'engsextosemestre@gmail.com', name: 'Fonotherapp' },
-        subject: "Parabens, sua conta foi criada",
-        text: "Fonotherapp",
+        subject: 'Parabens, sua conta foi criada',
+        text: 'Fonotherapp',
         html: `${welcome(nome)}`
       };
       sgMail
@@ -25,7 +25,7 @@ class EmailController {
         .then(() => {
         })
         .catch((error) => {
-          console.error("Erro ao enviar email ", error);
+          console.error('Erro ao enviar email ', error);
         });
     }
   }
@@ -38,8 +38,8 @@ class EmailController {
       const msg = {
         to: email,
         from: { email: 'engsextosemestre@gmail.com', name: 'Fonotherapp' },
-        subject: "Código de Recuperação",
-        text: "Fonotherapp",
+        subject: 'Código de Recuperação',
+        text: 'Fonotherapp',
         html: `${sendCode(code)}`
       };
       sgMail
@@ -47,7 +47,7 @@ class EmailController {
         .then(() => {
         })
         .catch((error) => {
-          console.error("Erro ao enviar email ", error);
+          console.error('Erro ao enviar email ', error);
         });
     }
 
@@ -61,17 +61,17 @@ class EmailController {
       const msg = {
         to: email,
         from: { email: 'engsextosemestre@gmail.com', name: 'Fonotherapp' },
-        subject: "Senha alterada",
-        text: "Fonotherapp",
+        subject: 'Senha alterada',
+        text: 'Fonotherapp',
         html: `${chagedPassword()}`
       };
       sgMail
         .send(msg)
         .then(() => {
-          console.log("Email enviado")
+          console.log('Email enviado')
         })
         .catch((error) => {
-          console.error("Erro ao enviar email ", error);
+          console.error('Erro ao enviar email ', error);
         });
     }
 

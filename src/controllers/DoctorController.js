@@ -1,5 +1,6 @@
-const Doctor = require("../models/Doctor");
-const { z, ZodError} = require("zod");
+const Doctor = require('../models/Doctor');
+const Person = require('../models/Person');
+const { z, ZodError} = require('zod');
 class DoctorController {
 
     async create(req, res) {
@@ -20,13 +21,15 @@ class DoctorController {
         const { doc_id } = req.body;
 
         try {
-            const doctor = await Doctor.findByPk(doc_id);
+            const doctor = await Doctor.findByPk(doc_id, { include: {
+                model: Person
+            }});
 
             if (doctor) {
                 return res.send(doctor)
             }
 
-            return res.status(404).send({ mensage: "Doctor not found" })
+            return res.status(404).send({ mensage: 'Doctor not found' })
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
@@ -47,7 +50,7 @@ class DoctorController {
                 return res.send(doctor)
             }
 
-            return res.status(400).send({ mensage: "Doctor not found" })
+            return res.status(400).send({ mensage: 'Doctor not found' })
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
