@@ -8,8 +8,8 @@ class ProtocolController {
     async create(req, res) {
         const createSchema = z.object({
             doc_id: z.number().int().positive(),
-            name: z.string().maxLength(150),
-            description: z.string().maxLength(255),
+            name: z.string().max(150),
+            description: z.string().max(255),
             type: z.enum(['layout', 'prescription']),
         });
 
@@ -51,8 +51,8 @@ class ProtocolController {
 
     async update(req, res) {
         const updateSchema = z.object({
-            name: z.string().maxLength(150).optional(),
-            description: z.string().maxLength(255).optional(),
+            name: z.string().max(150).optional(),
+            description: z.string().max(255).optional(),
         });
 
         try {

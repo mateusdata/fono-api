@@ -9,7 +9,7 @@ class AuthController {
   async login(req, res) {
     const loginSchema = z.object({
       email: z.string().email().max(150),
-      password: z.string().maxLength(50),
+      password: z.string().max(50),
     });
 
 

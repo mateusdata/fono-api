@@ -5,9 +5,9 @@ class MuscleController {
 
     async create(req, res) {
         const createSchema = z.object({
-            name: z.string().maxLength(150),
+            name: z.string().max(150),
             exe_id: z.number().int().positive(),
-            latin_name: z.string().maxLength(150),
+            latin_name: z.string().max(150),
             image_urls: z.array(z.string().url().max(150)).optional()
         })
 
@@ -25,8 +25,8 @@ class MuscleController {
 
     async update(req, res) {
         const updateSchema = z.object({
-            name: z.string().maxLength(150).optional(),
-            latin_name: z.string().maxLength(150).optional(),
+            name: z.string().max(150).optional(),
+            latin_name: z.string().max(150).optional(),
             image_urls: z.array(z.string().url().max(150)).optional()
         })
 

@@ -59,7 +59,7 @@ class PasswordResetController {
   async resetPassword(req, res) {
     const resetSchema = z.object({
       email: z.string().email().max(150),
-      newPassword: z.string().maxLength(50)
+      newPassword: z.string().max(50)
     });
 
 

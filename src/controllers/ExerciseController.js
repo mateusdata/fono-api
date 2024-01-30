@@ -6,13 +6,13 @@ class ExerciseController {
 
     async create(req, res) {
         const createSchema = z.object({
-            name: z.string().maxLength(150),
+            name: z.string().max(150),
             mus_id: z.number().int().positive().optional(),
             status: z.enum(['active', 'banned', 'inactive']).optional(),
-            objective: z.string().maxLength(250),
-            description: z.string().maxLength(250),
-            video_urls: z.array(z.string().url().maxLength(150)),
-            academic_sources: z.array(z.string().maxLength(150))
+            objective: z.string().max(250),
+            description: z.string().max(250),
+            video_urls: z.array(z.string().url().max(150)),
+            academic_sources: z.array(z.string().max(150))
         })
 
 
@@ -30,11 +30,11 @@ class ExerciseController {
 
     async update(req, res) {
         const updateSchema = z.object({
-            name: z.string().maxLength(150).optional(),
+            name: z.string().max(150).optional(),
             status: z.enum(['active', 'banned', 'inactive']).optional(),
-            description: z.string().maxLength(250).optional(),
+            description: z.string().max(250).optional(),
             video_urls: z.array(z.string().url().max(150)).optional(),
-            academic_sources: z.array(z.string().maxLength(150)).optional()
+            academic_sources: z.array(z.string().max(150)).optional()
         })
 
         try {

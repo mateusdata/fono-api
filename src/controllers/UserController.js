@@ -9,8 +9,8 @@ class UserController {
 
   async createUser(req, res) {
     const userSchema = z.object({
-      first_name: z.string().maxLength(150),
-      password: z.string().maxLength(150),
+      first_name: z.string().max(150),
+      password: z.string().max(150),
       email: z.string().email().max(150),
     });
 
