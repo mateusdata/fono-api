@@ -1,13 +1,21 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../config/sequelize')
+const sequelize = require('../config/sequelize');
+const Person = require('./Person');
 
-class Pacient extends Model {}
+class Pacient extends Model { }
 
 Pacient.init({
   pac_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
+  },
+  per_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Person,
+      key: 'per_id'
+    }
   },
   status: {
     type: DataTypes.ENUM,
@@ -31,4 +39,7 @@ Pacient.init({
   updatedAt: 'updated_at',
 });
 
-module.exports =  Pacient;
+Pacient.Person = Pacient.belongsTo(Person, { foreignKey: 'per_id', targetKey: 'per_id' });
+Person.Pacient= Person.hasOne(Pacient, { foreignKey: 'per_id', targetKey: 'per_id' });
+
+module.exports = Pacient;

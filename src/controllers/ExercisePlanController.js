@@ -15,6 +15,10 @@ class ExercisePlanController {
         try {
             const exercise_plan = await ExercisePlan.create(createSchema.parse(req.body));
 
+            if(req.body.pro_id){
+                await exercise_plan.addProtocol(await Protocol.findByPk(req.body.pro_id));
+            }
+            
             if (exercise_plan) {
                 return res.status(200).send(exercise_plan);
             }

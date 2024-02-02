@@ -18,10 +18,10 @@ class DoctorController {
     }
 
     async info(req, res) {
-        const { doc_id } = req.body;
+        const { id } = req.body;
 
         try {
-            const doctor = await Doctor.findByPk(doc_id, { include: {
+            const doctor = await Doctor.findByPk(id, { include: {
                 model: Person
             }});
 

@@ -17,6 +17,10 @@ Exercise.init({
         type: DataTypes.TEXT,
         allowNull: true,
     },
+    objective: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
     status: {
         type: DataTypes.ENUM,
         defaultValue: 'active',

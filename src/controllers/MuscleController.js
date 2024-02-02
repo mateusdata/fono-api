@@ -1,4 +1,5 @@
-const Muscle = require("../models/Muscle");
+const Muscle = require('../models/Muscle');
+const Exercise= require('../models/Exercise');
 const { z, ZodError } = require('zod');
 
 class MuscleController {
@@ -6,19 +7,25 @@ class MuscleController {
     async create(req, res) {
         const createSchema = z.object({
             name: z.string().max(150),
-            exe_id: z.number().int().positive(),
+            exe_id: z.number().int().positive().optional(),
             latin_name: z.string().max(150),
             image_urls: z.array(z.string().url().max(150)).optional()
         })
 
         try {
             const muscle = await Muscle.create(createSchema.parse(req.body));
+            
+            if(req.body.exe_id){
+                await muscle.addExercise(await Exercise.findByPk(req.body.exe_id));
+            }
+            
 
             if (muscle) {
                 return res.status(200).send(muscle);
             }
 
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }

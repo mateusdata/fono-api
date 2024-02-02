@@ -1,6 +1,7 @@
 const Exercise = require('../models/Exercise');
 const { z, ZodError } = require('zod');
 const MuscleHasExercise = require('../models/MuscleHasExercise');
+const Muscle = require('../models/Muscle');
 
 class ExerciseController {
 
@@ -24,6 +25,7 @@ class ExerciseController {
             }
 
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -47,6 +49,7 @@ class ExerciseController {
 
             return res.status(400).send({ mensage: 'Exercise not found' });
         } catch (error) {
+    
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
