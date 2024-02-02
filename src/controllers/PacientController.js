@@ -5,7 +5,7 @@ const Person = require('../models/Person');
 
 class PacientController {
     async create(req, res) {
-        const pacientSchema = z.object({
+        const createSchema = z.object({
             first_name: z.string().max(150),
             last_name: z.string().max(150),
             cpf: z.string().length(11)/*.refine(cpfValidation, { message: 'Invalid cpf number' })*/,
@@ -16,7 +16,7 @@ class PacientController {
 
             const pacient = await Pacient.create({
                 status: 'active',
-                person: { ...pacientSchema.parse(req.body) }
+                person: { ...createSchema.parse(req.body) }
             }, {
                 include: Pacient.Person,
             });
@@ -27,18 +27,37 @@ class PacientController {
 
             return res.status(403).send({ message: 'Pacient could not be created' });
         } catch (error) {
-            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
     }
 
     async update(req, res) {
+        const updateSchema = z.object({
+            first_name: z.string().max(150).optional(),
+            last_name: z.string().max(150).optional(),
+        });
 
+        try {
+            const pacient = await Pacient.findByPk(req.params.id, { include: Person });
+
+            await pacient?.update(updateSchema.parse(req.body));
+
+            (await pacient?.getPerson()).update(updateSchema.parse(req.body));
+              
+            if (pacient) {
+                return res.status(200).send(pacient);
+            }
+
+            return res.status(403).send({ message: 'Pacient could not be updated' });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
     }
 
     async info(req, res) {
-       
+
         try {
 
             const pacient = await Pacient.findByPk(req.params.id, { include: Person });
@@ -60,7 +79,6 @@ class PacientController {
         });
 
         try {
-
 
             const { pac_id, pro_id } = protocolSchema.parse(req.body);
 

@@ -46,6 +46,7 @@ router.post('/update-protocol/:id', ProtocolController.update);
 
 router.post('/create-pacient', PacientController.create);
 router.get('/info-pacient/:id', PacientController.info);
+router.post('/update-pacient/:id', PacientController.update);
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);
