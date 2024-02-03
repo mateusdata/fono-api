@@ -33,7 +33,7 @@ class AuthController {
           expiresIn: '60s',
         });
 
-        return res.send({ token, email: user.email, name: 'mateus' });
+        return res.send({ token, email: user.email, name: user.first_name });
 
       } 
         
