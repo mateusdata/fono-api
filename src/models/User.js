@@ -9,6 +9,10 @@ User.init({
     primaryKey: true,
     autoIncrement: true,
   },
+  nick_name:{
+    type: DataTypes.CHAR(150),
+    allowNull: false,
+  },
   email: {
     type: DataTypes.CHAR(150),
     allowNull: false,
