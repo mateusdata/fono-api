@@ -1,7 +1,8 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
+const User = require('./User');
 
-class Doctor extends Model {}
+class Doctor extends Model { }
 
 Doctor.init({
   doc_id: {
@@ -9,7 +10,14 @@ Doctor.init({
     primaryKey: true,
     autoIncrement: true,
   },
-  gov_license:{
+  use_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: User,
+      key: 'use_id'
+    }
+  },
+  gov_license: {
     type: DataTypes.INTEGER,
     unique: true,
     allowNull: true,
@@ -39,4 +47,7 @@ Doctor.init({
   updatedAt: 'updated_at',
 });
 
-module.exports =  Doctor;
+Doctor.User = Doctor.belongsTo(User, { foreignKey: 'use_id', targetKey: 'use_id' });
+User.Doctor = User.hasOne(Doctor, { foreignKey: 'use_id', sourceKey: 'use_id' });
+
+module.exports = Doctor;

@@ -4,6 +4,7 @@ const User = require('../models/User');
 const EmailController = require('./EmailController');
 const sequelize = require('../config/sequelize');
 const { z, ZodError } = require('zod');
+const Doctor = require('../models/Doctor');
 
 class UserController {
 
@@ -17,17 +18,28 @@ class UserController {
     const t = await sequelize.transaction();
 
     try {
+
       const { nick_name, password, email } = userSchema.parse(req.body);
+      const user = await User.create({
+        nick_name, password, email, roles: ['doctor'],
+        doctor: {
+          gov_license: null,
+        },
+      },
+        {
+          transaction: t,
+          include: User.Doctor
+        }
+      );
 
-      const salt = await bcrypt.genSalt(5);
-      const hash = await bcrypt.hash(password, salt);
-      const user = await User.create({ nick_name: nick_name, email: email, password: hash, roles: ['doctor'] }, { transaction: t });
-
-      const token = jwt.sign({ id_token: user.user_id }, process.env.secretKey, { expiresIn: '20d' });
+      const token = jwt.sign({ id_token: user.use_id }, process.env.secretKey, { expiresIn: '20d' });
       //const sendEmail = await EmailController.welcome(email, nick_name);
 
       await t.commit();
-      return res.send({ token, name: nick_name, message: 'User has been created' });
+
+      const userDoc = await user.reload({ include: Doctor });
+
+      return res.send({ token, user_id: userDoc.get('use_id'), nick_name: userDoc.get('nick_name'), doc_id: userDoc.get('doctor').get('doc_id'), message: 'User has been created' });
     } catch (error) {
       console.log(error);
       await t.rollback();

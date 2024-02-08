@@ -41,6 +41,12 @@ Person.init({
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  indexes:[
+    {
+      name: 'person_first_name_last_name_cpf_idx',
+      fields:['first_name', 'last_name', 'cpf']
+    }
+  ]
 });
 
 

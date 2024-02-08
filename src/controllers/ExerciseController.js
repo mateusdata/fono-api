@@ -2,6 +2,7 @@ const Exercise = require('../models/Exercise');
 const { z, ZodError } = require('zod');
 const MuscleHasExercise = require('../models/MuscleHasExercise');
 const Muscle = require('../models/Muscle');
+const { Sequelize, Op } = require('sequelize');
 
 class ExerciseController {
 
@@ -12,7 +13,7 @@ class ExerciseController {
             status: z.enum(['active', 'banned', 'inactive']).optional(),
             objective: z.string().max(250),
             description: z.string().max(250),
-            video_urls: z.array(z.string().url().max(150)),
+            video_urls: z.array(z.string().max(150)),
             academic_sources: z.array(z.string().max(150))
         })
 
@@ -35,7 +36,7 @@ class ExerciseController {
             name: z.string().max(150).optional(),
             status: z.enum(['active', 'banned', 'inactive']).optional(),
             description: z.string().max(250).optional(),
-            video_urls: z.array(z.string().url().max(150)).optional(),
+            video_urls: z.array(z.string().max(150)).optional(),
             academic_sources: z.array(z.string().max(150)).optional()
         })
 
@@ -49,7 +50,7 @@ class ExerciseController {
 
             return res.status(400).send({ mensage: 'Exercise not found' });
         } catch (error) {
-    
+
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -95,6 +96,43 @@ class ExerciseController {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
+    }
+
+    async search(req, res) {
+
+        try {
+
+            const exercises = await Exercise.findAll({
+                where: {
+                    [Op.or]: [
+                        {
+                            name: {
+                                [Op.match]: Sequelize.fn('to_tsquery', req.body.search.replaceAll(/\s+/g, " | "))
+                            }
+                        }, {
+                            description: {
+                                [Op.match]: Sequelize.fn('to_tsquery', req.body.search.replaceAll(/\s+/g, " | "))
+                            }
+                        }, {
+                            objective: {
+                                [Op.match]: Sequelize.fn('to_tsquery', req.body.search.replaceAll(/\s+/g, " | "))
+                            }
+                        }
+                    ]
+
+                }
+
+            });
+
+            if (exercises) {
+                return res.status(200).send(exercises);
+            }
+
+            return res.status(400).send({ mensage: 'Exercise not found' });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
     }
 }
 

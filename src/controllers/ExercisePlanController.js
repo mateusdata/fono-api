@@ -1,6 +1,7 @@
 const Exercise = require('../models/Exercise');
 const ExercisePlan = require('../models/ExercisePlan');
 const { z, ZodError } = require('zod');
+const Protocol = require('../models/Protocol');
 
 class ExercisePlanController {
 
@@ -16,7 +17,7 @@ class ExercisePlanController {
             const exercise_plan = await ExercisePlan.create(createSchema.parse(req.body));
 
             if(req.body.pro_id){
-                await exercise_plan.addProtocol(await Protocol.findByPk(req.body.pro_id));
+                const protocol = await Protocol.findByPk(req.body.pro_id);
             }
             
             if (exercise_plan) {
