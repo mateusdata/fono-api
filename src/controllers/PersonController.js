@@ -48,7 +48,12 @@ class PersonController {
         });
 
         try {
-            return res.status(200).send(await Person.create(PersonSchema.parse(req.body)));
+            const person = await Person.create(PersonSchema.parse(req.body));
+            if (person) {
+                return res.status(200).send(person);
+            }
+
+            return res.status(409).send({message:''});
         } catch (error) {
             console.log(error)
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');

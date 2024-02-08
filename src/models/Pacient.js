@@ -40,6 +40,6 @@ Pacient.init({
 });
 
 Pacient.Person = Pacient.belongsTo(Person, { foreignKey: 'per_id', targetKey: 'per_id' });
-Person.Pacient= Person.hasOne(Pacient, { foreignKey: 'per_id', targetKey: 'per_id' });
+Person.Pacient = Person.hasOne(Pacient, { foreignKey: 'per_id', sourceKey: 'per_id' });
 
 module.exports = Pacient;

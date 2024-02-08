@@ -1,6 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 const Doctor = require('./Doctor');
+const Pacient = require('./Pacient');
 
 class Protocol extends Model { }
 
@@ -21,12 +22,6 @@ Protocol.init({
     name: {
         type: DataTypes.STRING(150),
         allowNull: false,
-    },
-    type: {
-        type: DataTypes.ENUM,
-        allowNull: false,
-        values: ['layout', 'prescription'],
-        defaultValue: 'layout',
     },
     description: {
         type: DataTypes.TEXT,
@@ -53,5 +48,11 @@ Protocol.init({
     createdAt: 'created_at',
     updatedAt: 'updated_at',
 });
+
+Protocol.belongsTo(Doctor, { foreignKey: 'doc_id' });
+Doctor.hasMany(Protocol, { foreignKey: 'doc_id' });
+
+Protocol.belongsTo(Pacient, { foreignKey: 'pac_id' });
+Pacient.hasMany(Protocol, { foreignKey: 'pac_id' })
 
 module.exports = Protocol;

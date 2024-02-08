@@ -15,11 +15,11 @@ Exercise.init({
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: false,
     },
     objective: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: false,
     },
     status: {
         type: DataTypes.ENUM,
@@ -42,13 +42,21 @@ Exercise.init({
         type: DataTypes.DATE,
         allowNull: true,
     },
+    
 }, {
     sequelize,
     modelName: 'exercise',
     tableName: 'exercise',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    updatedAt: 'updated_at',
+    indexes:[
+        {
+            name: 'exercise_objective_name_description_idx',
+            fields:['name', 'description', 'objective'],
+            type: 'FULLTEXT'
+        }
+    ]
 });
 
 module.exports = Exercise;

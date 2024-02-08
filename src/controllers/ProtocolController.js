@@ -10,7 +10,6 @@ class ProtocolController {
             doc_id: z.number().int().positive(),
             name: z.string().max(150),
             description: z.string().max(255),
-            type: z.enum(['layout', 'prescription']),
         });
 
         try {

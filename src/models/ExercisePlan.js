@@ -43,7 +43,7 @@ ExercisePlan.init({
     updatedAt: 'updated_at'
 });
 
-ExercisePlan.hasOne(Exercise, { sourceKey: 'exe_id', foreignKey: 'exe_id' });
-Exercise.belongsToMany(ExercisePlan, { through: ExercisePlan, foreignKey: 'exe_id', otherKey: 'exe_id' });
+ExercisePlan.belongsTo(Exercise, { foreignKey: 'exe_id' });
+Exercise.hasMany(ExercisePlan, { foreignKey: 'exe_id' });
 
 module.exports = ExercisePlan;
