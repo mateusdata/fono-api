@@ -48,13 +48,25 @@ class UserController {
   }
 
   async update(req, res) {
-    const user = await User.findByPk(req.params.id);
-    const { email } = req.body;
+    const updateSchema = z.object({
+      nick_name: z.string().max(150).optional(),
+      email: z.string().email().max(150).optional(),
+    });
 
     try {
-      user.update({ email });
+      const user = await User.findByPk(req.params.id);
 
-      return res.statu(200).send('User has been updated');
+      if (!user) {
+        return res.status(404).send({ message: 'User not found' });
+      }
+
+      const updated = await user.update(updateSchema.parse(req.body));
+
+      if(!updated){
+        return res.status(403).send({ message: 'User not updated' })
+      }
+
+      return res.status(200).send({ use_id: user.use_id, email: user.email, nick_name: user.nick_name });
     } catch (error) {
       return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
@@ -63,13 +75,13 @@ class UserController {
   async info(req, res) {
     const user_id = req.params.id;
 
-    const user = await User.findByPk(user_id, { attributes: ['use_id', 'email', 'created_at', 'updated_at'] });
+    const user = await User.findByPk(user_id, { attributes: { exclude: ['password', 'created_at', 'updated_at'] } });
 
-    if (user) {
-      return res.status(200).send(user);
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
     }
 
-    return res.status(500).send({ message: 'User not found' });
+    return res.status(200).send(user);
   }
 
 }
