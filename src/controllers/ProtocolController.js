@@ -1,6 +1,6 @@
 const { z, ZodError } = require('zod');
 const Protocol = require('../models/Protocol');
-const ProtocolHasExercisePlan = require('../models/ProtocolHasExercisePlan');
+
 const Exercise = require('../models/Exercise');
 const ExercisePlan = require('../models/ExercisePlan');
 
@@ -8,6 +8,7 @@ class ProtocolController {
     async create(req, res) {
         const createSchema = z.object({
             doc_id: z.number().int().positive(),
+            ses_id: z.number().int().positive(),
             name: z.string().max(150),
             description: z.string().max(255),
         });
@@ -32,8 +33,13 @@ class ProtocolController {
             const protocol = await Protocol.findByPk(req.params.id, {
                 include: {
                     model: ExercisePlan,
-                    include: Exercise
-                }
+                    attributes: { exclude: ['pro_id', 'exe_id', 'created_at', 'updated_at'] },
+                    include: {
+                        model: Exercise,
+                        attributes: { exclude: ['created_at', 'updated_at'] },
+                    }
+                },
+                attributes:{exclude:['created_at', 'updated_at']}
             });
 
             if (protocol) {
@@ -56,7 +62,7 @@ class ProtocolController {
 
         try {
 
-            const protocol = Protocol.findByPk(req.params.id)
+            const protocol = await Protocol.findByPk(req.params.id)
                 .then((pro) => pro.update(updateSchema.parse(req.body)));
 
             if (protocol) {

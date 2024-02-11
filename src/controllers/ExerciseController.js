@@ -1,6 +1,5 @@
 const Exercise = require('../models/Exercise');
 const { z, ZodError } = require('zod');
-const MuscleHasExercise = require('../models/MuscleHasExercise');
 const Muscle = require('../models/Muscle');
 const { Sequelize, Op } = require('sequelize');
 
@@ -85,8 +84,8 @@ class ExerciseController {
 
         try {
             const { mus_id, exe_id } = linkSchema.parse(req.body);
-            const link = MuscleHasExercise.create({ mus_id, exe_id });
-
+            Muscle.findByPk(mus_id).then((muscle) => muscle.addExercise(Exercise.findByPk(exe_id)));
+           
             if (link) {
                 return res.status(200).send({ message: 'Exercise attributed successfuly' });
             }
