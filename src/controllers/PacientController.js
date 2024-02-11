@@ -9,7 +9,7 @@ const Doctor = require('../models/Doctor');
 class PacientController {
     async create(req, res) {
         const createSchema = z.object({
-            doc_id: z.number().positive().optional(),
+            doc_id: z.number().positive(),
             first_name: z.string().max(150),
             last_name: z.string().max(150),
             cpf: z.string().length(11)/*.refine(cpfValidation, { message: 'Invalid cpf number' })*/,

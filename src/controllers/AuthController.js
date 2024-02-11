@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { z, ZodError } = require('zod');
+const Doctor = require('../models/Doctor');
 
 require('dotenv').config();
 
@@ -17,7 +18,8 @@ class AuthController {
       const { email, password } = loginSchema.parse(req.body);
 
       const user = await User.findOne({
-        where: { email: email }
+        where: { email: email },
+        include: Doctor
       });
 
       if (!user) {
@@ -26,14 +28,13 @@ class AuthController {
 
       const isValidUser = await bcrypt.compare(password, user.password);
 
-      console.log(isValidUser);
 
       if (isValidUser) {
         const token = jwt.sign({ id_token: user.id }, process.env.secretKey, {
           expiresIn: '60s',
         });
 
-        return res.send({ token, email: user.email, name: 'mateus' });
+        return res.send({ token, email: user.email, usu_id: user.use_id, doc_id: user.doctor.doc_id,  nick_name: user.nick_name });
 
       } 
         

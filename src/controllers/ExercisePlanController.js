@@ -1,24 +1,19 @@
 const Exercise = require('../models/Exercise');
 const ExercisePlan = require('../models/ExercisePlan');
 const { z, ZodError } = require('zod');
-const Protocol = require('../models/Protocol');
 
 class ExercisePlanController {
 
     async create(req, res) {
         const createSchema = z.object({
             exe_id: z.number().int().positive(),
-            pro_id: z.number().int().positive().optional(),
+            pro_id: z.number().int().positive(),
             repetitions: z.number().int().positive(),
             series: z.number().int().positive(),
         });
 
         try {
             const exercise_plan = await ExercisePlan.create(createSchema.parse(req.body));
-
-            if(req.body.pro_id){
-                const protocol = await Protocol.findByPk(req.body.pro_id);
-            }
             
             if (exercise_plan) {
                 return res.status(200).send(exercise_plan);

@@ -13,6 +13,7 @@ const MuscleController = require('../controllers/MuscleController');
 const ExercisePlanController = require('../controllers/ExercisePlanController');
 const ProtocolController = require('../controllers/ProtocolController');
 const PacientController = require('../controllers/PacientController');
+const SessionController = require('../controllers/SessionController');
 
 
 router.post('/create-user', UserController.createUser);
@@ -43,14 +44,19 @@ router.get('/info-exercise-plan/:id', ExercisePlanController.info);
 router.post('/update-exercise-plan/:id', ExercisePlanController.update);
 
 
-router.post('/create-protocol', ProtocolController.create);
-router.get('/info-protocol/:id', ProtocolController.info);
-router.post('/update-protocol/:id', ProtocolController.update);
-
 router.post('/create-pacient', PacientController.create);
 router.get('/info-pacient/:id', PacientController.info);
 router.post('/update-pacient/:id', PacientController.update);
 router.post('/protocol-to-pacient', PacientController.attachProtocol)
+
+router.post('/create-session', SessionController.create);
+router.post('/update-session/:id', SessionController.update);
+router.get('/end-session/:id', SessionController.end);
+
+
+router.post('/create-protocol', ProtocolController.create);
+router.get('/info-protocol/:id', ProtocolController.info);
+router.post('/update-protocol/:id', ProtocolController.update);
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);

@@ -1,6 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 const Exercise = require('./Exercise');
+const Protocol = require('./Protocol');
 
 class ExercisePlan extends Model { }
 
@@ -10,11 +11,19 @@ ExercisePlan.init({
         primaryKey: true,
         autoIncrement: true,
     },
+    pro_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: Protocol,
+            key: 'pro_id'
+        }
+    },
     exe_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Exercise',
+            model: Exercise,
             key: 'exe_id'
         }
     },
@@ -45,5 +54,8 @@ ExercisePlan.init({
 
 ExercisePlan.belongsTo(Exercise, { foreignKey: 'exe_id' });
 Exercise.hasMany(ExercisePlan, { foreignKey: 'exe_id' });
+
+ExercisePlan.belongsTo(Protocol, { foreignKey: 'pro_id', });
+Protocol.hasMany(ExercisePlan, { foreignKey: 'pro_id' });
 
 module.exports = ExercisePlan;
