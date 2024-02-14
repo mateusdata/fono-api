@@ -1,7 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 const Doctor = require('./Doctor');
-const Pacient = require('./Pacient');
 const Session = require('./Session');
 
 class Protocol extends Model { }
@@ -60,5 +59,8 @@ Protocol.init({
 
 Protocol.belongsTo(Doctor, { foreignKey: 'doc_id' });
 Doctor.hasMany(Protocol, { foreignKey: 'doc_id' });
+
+Session.hasOne(Protocol, { foreignKey: 'ses_id' });
+Protocol.belongsTo(Session, { foreignKey: 'ses_id' });
 
 module.exports = Protocol;

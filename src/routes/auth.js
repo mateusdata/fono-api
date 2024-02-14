@@ -14,6 +14,7 @@ const ExercisePlanController = require('../controllers/ExercisePlanController');
 const ProtocolController = require('../controllers/ProtocolController');
 const PacientController = require('../controllers/PacientController');
 const SessionController = require('../controllers/SessionController');
+const QuestionnaireController = require('../controllers/QuestionnaireController');
 
 
 router.post('/create-user', UserController.createUser);
@@ -52,11 +53,16 @@ router.post('/protocol-to-pacient', PacientController.attachProtocol)
 router.post('/create-session', SessionController.create);
 router.post('/update-session/:id', SessionController.update);
 router.get('/end-session/:id', SessionController.end);
-
+router.get('/info-session/:id', SessionController.info);
+router.get('/last-sessions', SessionController.lastSessions);
 
 router.post('/create-protocol', ProtocolController.create);
 router.get('/info-protocol/:id', ProtocolController.info);
 router.post('/update-protocol/:id', ProtocolController.update);
+
+router.post('/create-questionnaire', QuestionnaireController.create)
+router.get('/info-questionnaire/:id', QuestionnaireController.info);
+router.post('/update-questionnaire/:id', QuestionnaireController.update);
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);
