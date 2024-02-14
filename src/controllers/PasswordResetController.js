@@ -57,6 +57,7 @@ class PasswordResetController {
   }
 
   async resetPassword(req, res) {
+    
     const resetSchema = z.object({
       email: z.string().email().max(150),
       newPassword: z.string().max(50)
@@ -77,7 +78,7 @@ class PasswordResetController {
         if (updateUser) {
 
           EmailController.passwordChanged(email);
-          res.send({ message: 'Your password has been updated' });
+         return  res.send({ message: 'Your password has been updated' });
 
         }
 
