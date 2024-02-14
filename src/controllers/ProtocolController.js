@@ -11,10 +11,20 @@ class ProtocolController {
             ses_id: z.number().int().positive(),
             name: z.string().max(150),
             description: z.string().max(255),
+            exercise_plans: z.object({
+                exe_id : z.number().int().positive(),
+                series : z.number().int().positive(),
+                repetitions: z.number().int().positive(),
+            }).array().optional(),
         });
 
         try {
-            const protocol = await Protocol.create(createSchema.parse(req.body));
+            const protocol = await Protocol.create(
+                createSchema.parse(req.body),
+                {
+                    include: Protocol.ExercisePlan
+                }
+            );
 
             if (protocol) {
                 return res.status(200).send(protocol);

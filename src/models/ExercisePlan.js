@@ -56,6 +56,6 @@ ExercisePlan.belongsTo(Exercise, { foreignKey: 'exe_id' });
 Exercise.hasMany(ExercisePlan, { foreignKey: 'exe_id' });
 
 ExercisePlan.belongsTo(Protocol, { foreignKey: 'pro_id', });
-Protocol.hasMany(ExercisePlan, { foreignKey: 'pro_id' });
+Protocol.ExercisePlan = Protocol.hasMany(ExercisePlan, { foreignKey: 'pro_id' });
 
 module.exports = ExercisePlan;

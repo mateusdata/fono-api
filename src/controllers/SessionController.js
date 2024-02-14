@@ -2,11 +2,10 @@ const { z, ZodError } = require('zod');
 const Session = require('../models/Session');
 const dayjs = require('dayjs');
 const duration = require('dayjs/plugin/duration');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
+const Protocol = require('../models/Protocol');
+const ExercisePlan = require('../models/ExercisePlan');
+const Exercise = require('../models/Exercise');
 
-dayjs.extend(utc)
-dayjs.extend(timezone)
 dayjs.extend(duration);
 
 
@@ -32,6 +31,32 @@ class SessionController {
 
     async info(req, res) {
 
+        try {
+            const session = await Session.findByPk(req.params.id, {
+                include: {
+                    model: Protocol,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
+                    include: {
+                        model: ExercisePlan,
+                        attributes: { exclude: ['pro_id', 'created_at', 'updated_at'] },
+                        include: {
+                            attributes: { exclude: ['created_at', 'updated_at'] },
+                            model: Exercise
+                        }
+                    }
+                },
+                attributes: { exclude: ['created_at', 'updated_at'] }
+            });
+
+            if (session) {
+
+                return res.status(200).send(session);
+            }
+
+            return res.status(404).send({ message: 'Session not found' });
+        } catch (error) {
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
     }
 
     async update(req, res) {
@@ -46,7 +71,7 @@ class SessionController {
             if (session) {
                 return res.status(200).send(session);
             }
-            
+
             return res.status(403).send({ message: 'Session could not be created' });
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -54,8 +79,6 @@ class SessionController {
     }
 
     async end(req, res) {
-        dayjs.tz.setDefault("America/Sao_Paulo");
-
 
         try {
 
@@ -66,8 +89,6 @@ class SessionController {
                 return res.status(200).send(session);
             }
 
-            console.log();
-
             return res.status(200).send({ message: 'Session could not be ended' });
         } catch (error) {
             console.log(error);
@@ -75,6 +96,18 @@ class SessionController {
         }
     }
 
+    async lastSessions(req, res) {
+        const limit = req.query.pageSize; // number of records per page
+        const offset = (req.query.page - 1) * req.query.pageSize;
+
+        const sessions = await Session.findAndCountAll({
+            limit: limit,
+            offset: offset,
+            attributes: { exclude: ['created_at', 'updated_at'] }
+        });
+
+        return res.status(200).send(sessions);
+    }
 }
 
 module.exports = new SessionController();
