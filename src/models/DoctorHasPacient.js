@@ -29,24 +29,19 @@ DoctorHasPacient.init({
   },
   created_at: {
     type: DataTypes.DATE,
-    defaultValue: '2023-10-02',
     allowNull: false,
   },
   updated_at: {
     type: DataTypes.DATE,
-    defaultValue: '2023-10-02',
     allowNull: true,
   },
 }, {
   sequelize,
   modelName: 'doctor_has_pacient',
   tableName: 'doctor_has_pacient',
-  timestamps: false,
+  timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 });
-
-Pacient.belongsToMany(Doctor, { through: DoctorHasPacient, foreignKey: 'pac_id', otherKey: 'doc_id' });
-Doctor.belongsToMany(Pacient, { through: DoctorHasPacient, foreignKey: 'doc_id', otherKey: 'pac_id' });
 
 module.exports = DoctorHasPacient;

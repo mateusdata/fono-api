@@ -1,6 +1,8 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 const User = require('./User');
+const Pacient = require('./Pacient');
+const DoctorHasPacient = require('./DoctorHasPacient');
 
 class Doctor extends Model { }
 
@@ -49,5 +51,8 @@ Doctor.init({
 
 Doctor.User = Doctor.belongsTo(User, { foreignKey: 'use_id', targetKey: 'use_id' });
 User.Doctor = User.hasOne(Doctor, { foreignKey: 'use_id', sourceKey: 'use_id' });
+
+Pacient.belongsToMany(Doctor, { through: DoctorHasPacient, foreignKey: 'pac_id', otherKey: 'doc_id' });
+Doctor.belongsToMany(Pacient, { through: DoctorHasPacient, foreignKey: 'doc_id', otherKey: 'pac_id' });
 
 module.exports = Doctor;

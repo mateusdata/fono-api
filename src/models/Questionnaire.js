@@ -34,4 +34,5 @@ Questionnaire.init({
     updatedAt: 'updated_at',
 });
 
+
 module.exports = Questionnaire;

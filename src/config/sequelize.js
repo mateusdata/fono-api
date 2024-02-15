@@ -8,6 +8,7 @@ const sequelize = new Sequelize(
   dialect: 'postgres',
   dialectModule: pg, 
   logging: false, //essa bagaça aqui fica mostrando os logs do sequelize no terminar.
+  timezone: 'America/Sao_Paulo'
 });
 sequelize
   .authenticate()

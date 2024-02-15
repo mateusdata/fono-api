@@ -1,16 +1,22 @@
 const { z, ZodError } = require('zod');
 const Question = require('../models/Question');
 const Questionnaire = require('../models/Questionnaire');
-const QuestionAnswered = require('../models/QuestionAnswered');
+const Answer = require('../models/Answer');
+const QuestionnaireSection = require('../models/Section');
+const Section = require('../models/Section');
+const Pacient = require('../models/Pacient');
 
 class QuestionnaireController {
     async create(req, res) {
         const createSchema = z.object({
             name: z.string().max(150),
             purpose: z.string().max(150),
-            questions: z.object({
+            sections: z.object({
                 name: z.string().max(150),
-                alternatives: z.array(z.string().max(150)),
+                questions: z.object({
+                    name: z.string().max(150),
+                    alternatives: z.array(z.string().max(150)),
+                }).array().optional(),
             }).array().optional(),
         });
 
@@ -18,7 +24,10 @@ class QuestionnaireController {
             const questionnaire = await Questionnaire.create(
                 createSchema.parse(req.body),
                 {
-                    include: Questionnaire.Question
+                    include: [{
+                        association: Questionnaire.Section,
+                        include: QuestionnaireSection.Question
+                    }]
                 }
             );
 
@@ -28,6 +37,7 @@ class QuestionnaireController {
 
             return res.status(400).send('Questionnaire could not be created');
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -37,8 +47,12 @@ class QuestionnaireController {
         try {
             const questionnaire = await Questionnaire.findByPk(req.params.id, {
                 include: {
-                    model: Question,
-                    attributes: { exclude: ['created_at', 'updated_at'] },
+                    model: Section,
+                    attributes: { exclude: ['qus_id', 'created_at', 'updated_at'] },
+                    include: {
+                        model: Question,
+                        attributes: { exclude: ['qhs_id', 'created_at', 'updated_at'] },
+                    }
                 },
                 attributes: { exclude: ['created_at', 'updated_at'] }
             });
@@ -50,7 +64,6 @@ class QuestionnaireController {
 
             return res.status(404).send({ message: 'Questionnaire not found' });
         } catch (error) {
-            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -82,16 +95,63 @@ class QuestionnaireController {
         }
     }
 
-    async answerQuestionnaire(req, res){
+    async answerQuestionnaire(req, res) {
         const answerSchema = z.object({
-            
+            pac_id: z.number().int().positive(),
+            answers: z.object({
+                que_id: z.number().int().positive(),
+                alternative: z.string().max(150)
+            }).array()
         });
 
-        try{
+        try {
+            const { pac_id, answers } = answerSchema.parse(req.body);
 
-        }catch(error){
+            const pacient = await Pacient.findByPk(pac_id);
+
+            if (!pacient) {
+                res.status(404).send({ message: 'Pacient not found' });
+            }
+
+            const created = await Answer.bulkCreate(answers.map((element) => Object({ pac_id, ...element })));
+
+            if (!created) {
+                return res.status(422).send({ message: "Could not save answers" });
+            }
+            return res.status(201).send(created);
+        } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
+    }
+
+    async answeredQuestionnaire(req, res) {
+        process.env.TZ='America/Sao_Paulo'
+
+        const questionnaire = await Questionnaire.findByPk(req.params.qus_id, {
+            attributes: { exclude: ['created_at', 'updated_at'] },
+            include: {
+                model: Section,
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                include: {
+                    model: Question,
+                    attributes: { exclude: ['qhs_id', 'created_at', 'updated_at'] },
+                    include: {
+                        model: Answer,
+                        attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
+                        include: {
+                            model: Pacient,
+                            attributes: [],
+                            where:{
+                                pac_id : req.params.pac_id
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return res.status(200).send(questionnaire);
     }
 }
 

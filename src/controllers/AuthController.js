@@ -23,7 +23,7 @@ class AuthController {
       });
 
       if (!user) {
-        return res.status(400).json({ status: 401, message: 'User doesn\'t exists' });
+        return res.status(401).json({ message: 'User doesn\'t exists' });
       }
 
       const isValidUser = await bcrypt.compare(password, user.password);
@@ -38,7 +38,7 @@ class AuthController {
 
       } 
         
-      return res.status(400).json({ status: 401, message: 'Incorrect email or password' });
+      return res.status(401).json({message: 'Incorrect email or password' });
 
     } catch (error) {
 

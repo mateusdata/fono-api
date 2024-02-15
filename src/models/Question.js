@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 
-const Questionnaire = require('./Questionnaire');
+const Section = require('./Section');
 
 class Question extends Model { }
 
@@ -12,12 +12,12 @@ Question.init({
         autoIncrement: true,
         allowNull: false,
     },
-    qus_id: {
+    qhs_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Questionnaire,
-            key: 'qus_id'
+            model: Section,
+            key: 'qhs_id'
         }
     },
     name: {
@@ -45,7 +45,7 @@ Question.init({
     updatedAt: 'updated_at',
 });
 
-Questionnaire.Question = Questionnaire.hasMany(Question, { foreignKey: 'qus_id' });
-Question.belongsTo(Questionnaire, { foreignKey: 'qus_id'});
+Section.Question = Section.hasMany(Question, { foreignKey: 'qhs_id' });
+Question.belongsTo(Section, { foreignKey: 'qhs_id'});
 
 module.exports = Question;
