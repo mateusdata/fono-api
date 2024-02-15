@@ -48,7 +48,8 @@ router.post('/update-exercise-plan/:id', ExercisePlanController.update);
 router.post('/create-pacient', PacientController.create);
 router.get('/info-pacient/:id', PacientController.info);
 router.post('/update-pacient/:id', PacientController.update);
-router.post('/protocol-to-pacient', PacientController.attachProtocol)
+router.post('/protocol-to-pacient', PacientController.attachProtocol);
+router.post('/search-pacient', PacientController.search);
 
 router.post('/create-session', SessionController.create);
 router.post('/update-session/:id', SessionController.update);
@@ -63,6 +64,8 @@ router.post('/update-protocol/:id', ProtocolController.update);
 router.post('/create-questionnaire', QuestionnaireController.create)
 router.get('/info-questionnaire/:id', QuestionnaireController.info);
 router.post('/update-questionnaire/:id', QuestionnaireController.update);
+router.post('/answer-questionnaire', QuestionnaireController.answerQuestionnaire);
+router.get('/answered-questionnaire/:qus_id/:pac_id', QuestionnaireController.answeredQuestionnaire)
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);

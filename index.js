@@ -4,8 +4,8 @@ const cors = require("cors");
 const app = express();
 const AuthRouter = require("./src/routes/auth");
 const ApiRouter = require("./src/routes/api");
-const path = require("path");
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
+var fs = require('fs');
 
 app.use(rateLimiter({
   windowMs: 1000,

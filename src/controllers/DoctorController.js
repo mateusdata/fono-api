@@ -1,8 +1,9 @@
 const Doctor = require('../models/Doctor');
-const DoctorHasPacient = require('../models/DoctorHasPacient');
 const Pacient = require('../models/Pacient');
+const Person = require('../models/Person');
 const User = require('../models/User');
 const { z, ZodError } = require('zod');
+
 class DoctorController {
 
     async create(req, res) {
@@ -72,10 +73,23 @@ class DoctorController {
     async searchMyPacients(req, res) {
         const { id } = req.params;
 
-        const pacients = await Doctor.findByPk(id, { include: Pacient });
-        // const pacients = await DoctorHasPacient.count();
+        const pacients = await Doctor.findByPk(id, {
+            attributes: { exclude: ['created_at', 'updated_at'] },
+            include: {
+                model: Pacient,
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                through: {
+                    attributes: []
+                },
+                include: { 
+                    model: Person,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
+                  
+                }
+            }
+        });
 
-        return res.status(200).send({ me: pacients });
+        return res.status(200).send(pacients);
     }
 
 }

@@ -4,10 +4,10 @@ const Pacient = require("./Pacient");
 const Question = require("./Question");
 
 
-class QuestionAnswered extends Model { }
+class Answer extends Model { }
 
 
-QuestionAnswered.init({
+Answer.init({
     qua_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -29,17 +29,34 @@ QuestionAnswered.init({
             model: Question,
             key: 'que_id'
         }
-    }
+    },
+    alternative: {
+        type: DataTypes.STRING(150),
+        allowNull: false
+    },
+    created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+    updated_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
 }, {
     sequelize,
-    modelName: 'question_answered',
+    modelName: 'answer',
     tableName: 'question_answered',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
 });
 
-QuestionAnswered.belongsTo(Pacient, { foreignKey: 'pac_id' });
-QuestionAnswered.belongsTo(Question, { foreignKey: 'que_id' });
 
-module.exports = QuestionAnswered;
+Answer.belongsTo(Pacient, { foreignKey: 'pac_id' });
+Pacient.hasMany(Answer, { foreignKey: 'pac_id' });
+
+Answer.belongsTo(Question, { foreignKey: 'que_id' });
+Question.hasOne(Answer, { foreignKey: 'que_id' });
+
+
+module.exports = Answer;

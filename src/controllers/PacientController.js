@@ -5,6 +5,7 @@ const Person = require('../models/Person');
 const ExercisePlan = require('../models/ExercisePlan');
 const sequelize = require('../config/sequelize');
 const Doctor = require('../models/Doctor');
+const { Op, Sequelize } = require('sequelize');
 
 class PacientController {
     async create(req, res) {
@@ -106,17 +107,32 @@ class PacientController {
 
     async search(req, res) {
 
+        // Make sure to not return pacient from other doctors
         try {
 
-            const pacients = await Pacient.findAll({
-                include: Person,
+            const pacients = await Person.findAll({
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                include: {
+                    model: Pacient,
+                    required: true,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
+                    include: {
+                        model: Doctor,
+                        where: {
+                            doc_id: req.body.doc_id
+                        },
+                        through: {
+                            attributes: []
+                        }
+                    }
+                },
                 where: {
                     [Op.or]: [
                         {
                             first_name: {
                                 [Op.match]: Sequelize.fn('to_tsquery', req.body.search.replaceAll(/\s+/g, " | "))
                             }
-                        }, 
+                        },
                         {
                             last_name: {
                                 [Op.match]: Sequelize.fn('to_tsquery', req.body.search.replaceAll(/\s+/g, " | "))
@@ -124,12 +140,10 @@ class PacientController {
                         },
                         {
                             cpf: {
-                                [Op.match]: Sequelize.fn('to_tsquery', req.body.search.replaceAll(/\s+/g, " | "))
+                                [Op.like]: `%${req.body.search}%`
                             }
                         },
-
                     ]
-
                 }
 
             });
@@ -140,6 +154,7 @@ class PacientController {
 
             return res.status(400).send({ mensage: 'Pacient not found' });
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
