@@ -20,7 +20,7 @@ app.use("/", AuthRouter);
 app.use("/", ApiRouter);
 
 app.get("/", async function (req, res) {
-  res.send({ projeto: "Fono App api v1"});
+  res.send("Fono");
 });
 
 
