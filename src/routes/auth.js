@@ -66,6 +66,8 @@ router.get('/info-questionnaire/:id', QuestionnaireController.info);
 router.post('/update-questionnaire/:id', QuestionnaireController.update);
 router.post('/answer-questionnaire', QuestionnaireController.answerQuestionnaire);
 router.get('/answered-questionnaire/:qus_id/:pac_id', QuestionnaireController.answeredQuestionnaire)
+router.get('/answered-questionnaire/:pac_id', QuestionnaireController.allAnsweredQuestionnaireForPacient)
+router.get('/next-questionnaire/:id', QuestionnaireController.nextQuestionnaire);
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);
