@@ -27,21 +27,11 @@ DoctorHasPacient.init({
     },
     allowNull: false
   },
-  created_at: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  updated_at: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
 }, {
   sequelize,
   modelName: 'doctor_has_pacient',
   tableName: 'doctor_has_pacient',
-  timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
+  timestamps: false,
 });
 
 module.exports = DoctorHasPacient;

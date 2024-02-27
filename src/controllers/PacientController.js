@@ -30,7 +30,7 @@ class PacientController {
             await t.commit();
 
             if (pacient) {
-                (await Doctor.findByPk(req.body.doc_id)).addPacient(pacient);
+                pacient.addDoctor(await Doctor.findByPk(req.body.doc_id));
                 return res.status(200).send(pacient);
             }
         } catch (error) {
