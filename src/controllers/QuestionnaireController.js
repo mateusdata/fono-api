@@ -5,6 +5,7 @@ const Answer = require('../models/Answer');
 const QuestionnaireSection = require('../models/Section');
 const Section = require('../models/Section');
 const Pacient = require('../models/Pacient');
+const { Op } = require('sequelize');
 
 class QuestionnaireController {
     async create(req, res) {
@@ -95,6 +96,60 @@ class QuestionnaireController {
         }
     }
 
+    async nextQuestionnaire(req, res) {
+        try {
+            const questionnaires = await Questionnaire.findAll({
+                attributes: ['qus_id'],
+                include: {
+                    model: Section,
+                    attributes: [],
+                    required: true,
+                    include: {
+                        model: Question,
+                        attributes: [],
+                        required: true,
+                        include: {
+                            model: Answer,
+                            required: true,
+                            include: {
+                                model: Pacient,
+                                required: true,
+                                where: {
+                                    pac_id: req.params.id
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const nextQuestionnaire = await Questionnaire.findOne({
+                where: {
+                    qus_id: {
+                        [Op.notIn]: questionnaires?.flatMap((record) => record.qus_id)
+                    }
+                },
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                include: {
+                    model: Section,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
+                    required: true,
+                    include: {
+                        model: Question,
+                        attributes: { exclude: ['qhs_id', 'created_at', 'updated_at'] },
+                        required: true,
+                    }
+                }
+
+            });
+
+            return res.status(200).send(nextQuestionnaire)
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
+    }
+
     async answerQuestionnaire(req, res) {
         const answerSchema = z.object({
             pac_id: z.number().int().positive(),
@@ -126,7 +181,6 @@ class QuestionnaireController {
     }
 
     async answeredQuestionnaire(req, res) {
-        process.env.TZ='America/Sao_Paulo'
 
         const questionnaire = await Questionnaire.findByPk(req.params.qus_id, {
             attributes: { exclude: ['created_at', 'updated_at'] },
@@ -142,8 +196,40 @@ class QuestionnaireController {
                         include: {
                             model: Pacient,
                             attributes: [],
-                            where:{
-                                pac_id : req.params.pac_id
+                            where: {
+                                pac_id: req.params.pac_id
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return res.status(200).send(questionnaire);
+    }
+
+    async allAnsweredQuestionnaireForPacient(req, res) {
+
+        const questionnaire = await Questionnaire.findAll({
+            attributes: { exclude: ['created_at', 'updated_at'] },
+            include: {
+                model: Section,
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                required: true,
+                include: {
+                    model: Question,
+                    attributes: { exclude: ['qhs_id', 'created_at', 'updated_at'] },
+                    required: true,
+                    include: {
+                        model: Answer,
+                        attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
+                        required: true,
+                        include: {
+                            model: Pacient,
+                            attributes: [],
+                            required: true,
+                            where: {
+                                pac_id: req.params.pac_id
                             }
                         }
                     }
