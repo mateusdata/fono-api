@@ -15,6 +15,7 @@ const ProtocolController = require('../controllers/ProtocolController');
 const PacientController = require('../controllers/PacientController');
 const SessionController = require('../controllers/SessionController');
 const QuestionnaireController = require('../controllers/QuestionnaireController');
+const PlanController = require('../controllers/PlanController');
 
 
 router.post('/create-user', UserController.createUser);
@@ -68,6 +69,12 @@ router.post('/answer-questionnaire', QuestionnaireController.answerQuestionnaire
 router.get('/answered-questionnaire/:qus_id/:pac_id', QuestionnaireController.answeredQuestionnaire)
 router.get('/answered-questionnaire/:pac_id', QuestionnaireController.allAnsweredQuestionnaireForPacient)
 router.get('/next-questionnaire/:id', QuestionnaireController.nextQuestionnaire);
+
+router.post('/create-plan', PlanController.create);
+router.get('/info-plan/:id', PlanController.info);
+router.post('/update-plan/:id', PlanController.update);
+router.get('/available-plans', PlanController.availablePlans);
+router.get('/set-user-plan/:use_id/:pla_id', PlanController.setUserPlan);
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);
