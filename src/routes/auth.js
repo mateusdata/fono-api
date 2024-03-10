@@ -16,9 +16,18 @@ const PacientController = require('../controllers/PacientController');
 const SessionController = require('../controllers/SessionController');
 const QuestionnaireController = require('../controllers/QuestionnaireController');
 const PlanController = require('../controllers/PlanController');
+const middlewarePayment = require('../middleware/payment');
 
-
+router.post('/login', AuthController.login);
+router.post('/send-reset-code', PasswordResetController.sendResetCode);
+router.post('/verify-reset-code', PasswordResetController.verifyResetCode);
+router.post('/reset-password', PasswordResetController.resetPassword);
 router.post('/create-user', UserController.createUser);
+
+//router.use(middlewareUser);
+
+router.use(middlewarePayment);
+
 router.get('/info-user/:id', UserController.info);
 router.post('/update-user/:id', UserController.update);
 
@@ -30,6 +39,7 @@ router.post('/create-doctor', DoctorController.create);
 router.get('/info-doctor/:id', DoctorController.info);
 router.post('/update-doctor/:id', DoctorController.update);
 router.get('/search-pacients/:id', DoctorController.searchMyPacients);
+router.get('/count-pacients/:id', DoctorController.countMyPacients);
 
 router.post('/create-exercise', ExerciseController.create);
 router.get('/info-exercise/:id', ExerciseController.info);
@@ -75,11 +85,6 @@ router.get('/info-plan/:id', PlanController.info);
 router.post('/update-plan/:id', PlanController.update);
 router.get('/available-plans', PlanController.availablePlans);
 router.get('/set-user-plan/:use_id/:pla_id', PlanController.setUserPlan);
-
-router.post('/login', AuthController.login);
-router.post('/send-reset-code', PasswordResetController.sendResetCode);
-router.post('/verify-reset-code', PasswordResetController.verifyResetCode);
-router.post('/reset-password', PasswordResetController.resetPassword);
 
 router.get('/islogged', middlewareUser, AuthController.isLogged);
 
