@@ -92,6 +92,30 @@ class DoctorController {
         return res.status(200).send(pacients);
     }
 
+    async countMyPacients(req, res) {
+        const { id } = req.params;
+
+        const n_pacients = await Doctor.count({
+            where:{
+                doc_id: id
+            },
+            attributes: { exclude: ['created_at', 'updated_at'] },
+            include: {
+                model: Pacient,
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                through: {
+                    attributes: []
+                },
+                include: { 
+                    model: Person,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
+                  
+                }
+            }
+        });
+
+        return res.status(200).send({doc_id: id, num_pacients: n_pacients});
+    }
 }
 
 module.exports = new DoctorController();
