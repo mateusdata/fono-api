@@ -33,7 +33,6 @@ MuscleHasExercise.init({
     timestamps: false,
 });
 
-Muscle.belongsToMany(Exercise, { through: MuscleHasExercise, foreignKey: 'mus_id', otherKey: 'exe_id' });
-Exercise.belongsToMany(Muscle, { through: MuscleHasExercise, foreignKey: 'exe_id', otherKey: 'mus_id' });
+
 
 module.exports = MuscleHasExercise;
