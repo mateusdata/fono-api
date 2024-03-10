@@ -70,7 +70,6 @@ class ExerciseController {
 
             return res.status(400).send({ mensage: 'Exercise not found' });
         } catch (error) {
-
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
