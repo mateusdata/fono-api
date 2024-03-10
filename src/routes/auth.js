@@ -26,7 +26,7 @@ router.post('/create-user', UserController.createUser);
 
 //router.use(middlewareUser);
 
-router.use(middlewarePayment);
+//router.use(middlewarePayment);
 
 router.get('/info-user/:id', UserController.info);
 router.post('/update-user/:id', UserController.update);
