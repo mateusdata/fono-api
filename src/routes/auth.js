@@ -1,6 +1,5 @@
 const { Router } = require('express');
 const router = Router();
-
 const UserController = require('../controllers/UserController');
 const PersonController = require('../controllers/PersonController');
 const DoctorController = require('../controllers/DoctorController');
@@ -16,6 +15,7 @@ const PacientController = require('../controllers/PacientController');
 const SessionController = require('../controllers/SessionController');
 const QuestionnaireController = require('../controllers/QuestionnaireController');
 const PlanController = require('../controllers/PlanController');
+const PaymentGatewayController = require('../controllers/PaymentGatewayController')
 const middlewarePayment = require('../middleware/payment');
 
 router.post('/login', AuthController.login);
@@ -45,7 +45,9 @@ router.post('/create-exercise', ExerciseController.create);
 router.get('/info-exercise/:id', ExerciseController.info);
 router.post('/update-exercise/:id', ExerciseController.update);
 router.post('/link-exercise-to-muscle', ExerciseController.linkExerciseToMuscle);
-router.post('/search-exercise', ExerciseController.search)
+router.post('/search-exercise', ExerciseController.search);
+router.get('/list-exercise', ExerciseController.list);
+
 
 router.post('/create-muscle', MuscleController.create);
 router.get('/info-muscle/:id', MuscleController.info);
@@ -86,6 +88,11 @@ router.post('/update-plan/:id', PlanController.update);
 router.get('/available-plans', PlanController.availablePlans);
 router.get('/set-user-plan/:use_id/:pla_id', PlanController.setUserPlan);
 
+router.post('/webhook', PaymentGatewayController.webhook);
+router.get('/list-plans', PaymentGatewayController.listPlans);
+
 router.get('/islogged', middlewareUser, AuthController.isLogged);
+
+
 
 module.exports = router;

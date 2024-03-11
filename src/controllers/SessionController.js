@@ -5,6 +5,7 @@ const duration = require('dayjs/plugin/duration');
 const Protocol = require('../models/Protocol');
 const ExercisePlan = require('../models/ExercisePlan');
 const Exercise = require('../models/Exercise');
+const { Op } = require('sequelize');
 
 dayjs.extend(duration);
 
@@ -97,16 +98,39 @@ class SessionController {
     }
 
     async lastSessions(req, res) {
-        const limit = req.query.pageSize; // number of records per page
-        const offset = (req.query.page - 1) * req.query.pageSize;
-
-        const sessions = await Session.findAndCountAll({
-            limit: limit,
-            offset: offset,
-            attributes: { exclude: ['created_at', 'updated_at'] }
+        const listSchema = z.object({
+            pageSize: z.coerce.number().positive(),
+            page: z.coerce.number().positive(),
         });
 
-        return res.status(200).send(sessions);
+        try {
+            const { pageSize, page } = listSchema.parse(req.query);
+            const limit = pageSize; // number of records per page
+            const offset = (page - 1) * pageSize;
+
+            const sessions = await Session.findAndCountAll({
+                limit: limit,
+                offset: offset,
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                where: {
+                    [Op.or]: [
+                        {
+                            pac_id: req.params.pac_id,
+                        },
+                        {
+                            doc_id: req.params.doc_id
+                        }
+                    ],
+                    pac_id: req.query.pac_id
+                }
+            });
+
+            return res.status(200).send(sessions);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
+
     }
 }
 
