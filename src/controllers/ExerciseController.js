@@ -84,7 +84,7 @@ class ExerciseController {
         try {
             const { mus_id, exe_id } = linkSchema.parse(req.body);
             Muscle.findByPk(mus_id).then((muscle) => muscle.addExercise(Exercise.findByPk(exe_id)));
-           
+
             if (link) {
                 return res.status(200).send({ message: 'Exercise attributed successfuly' });
             }
@@ -131,6 +131,39 @@ class ExerciseController {
             console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
+    }
+
+    async list(req, res) {
+        const listSchema = z.object({
+            pageSize: z.coerce.number().positive(),
+            page: z.coerce.number().positive(),
+        });
+
+        try {
+            const { pageSize, page } = listSchema.parse(req.query);
+
+            const limit = pageSize; // number of records per page
+            const offset = (page - 1) * pageSize;
+
+            console.log(limit, offset);
+            const exercises = await Exercise.findAndCountAll({
+                include: {
+                    model: Muscle,
+                },
+                limit: limit,
+                offset: offset,
+            });
+
+            if (exercises?.rows?.length === 0) {
+                return res.status(404).send({ message: 'No exercise found' });
+            }
+
+            return res.status(200).send(exercises);
+        } catch (error) {
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
+
+
     }
 }
 
