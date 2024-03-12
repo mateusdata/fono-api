@@ -8,7 +8,7 @@ class ExerciseController {
     async create(req, res) {
         const createSchema = z.object({
             name: z.string().max(150),
-            alternative_names: z.string().max(60).array(),
+            alternative_names: z.string().max(60).array().optional(),
             mus_id: z.number().int().positive().optional(),
             status: z.enum(['active', 'banned', 'inactive']).optional(),
             objective: z.string().max(400),
@@ -34,6 +34,7 @@ class ExerciseController {
     async update(req, res) {
         const updateSchema = z.object({
             name: z.string().max(150).optional(),
+            alternative_names: z.string().max(60).array().optional(),
             status: z.enum(['active', 'banned', 'inactive']).optional(),
             description: z.string().max(250).optional(),
             video_urls: z.array(z.string().max(150)).optional(),
