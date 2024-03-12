@@ -13,6 +13,10 @@ Exercise.init({
         type: DataTypes.STRING(150),
         allowNull: false,
     },
+    alternative_names: {
+        type: DataTypes.ARRAY(DataTypes.STRING(60)),
+        allowNull: false,
+    },
     description: {
         type: DataTypes.TEXT,
         allowNull: false,

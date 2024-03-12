@@ -6,6 +6,8 @@ const ExercisePlan = require('../models/ExercisePlan');
 const sequelize = require('../config/sequelize');
 const Doctor = require('../models/Doctor');
 const { Op, Sequelize } = require('sequelize');
+const Session = require('../models/Session');
+const Exercise = require('../models/Exercise');
 
 class PacientController {
     async create(req, res) {
@@ -157,6 +159,27 @@ class PacientController {
             console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
+    }
+
+    async currentProtocol(req, res){
+
+        const protocols = await Pacient.findByPk(req.params.id, {
+            include:{
+                model:Session,
+                include:{
+                    model: Protocol,
+                    include: {
+                        model: ExercisePlan,
+                        include: Exercise
+                    }
+                },
+                limit:1,
+            }
+
+        });
+
+
+        return res.status(200).send(protocols);
     }
 }
 

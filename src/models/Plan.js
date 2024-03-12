@@ -1,7 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
-const User  = require('./User');
-const UserHasPlan = require('./UserhasPlan');
+const User = require('./User');
 
 class Plan extends Model { }
 
@@ -25,7 +24,7 @@ Plan.init({
         type: DataTypes.DECIMAL,
         allowNull: false
     },
-    taxes:{
+    taxes: {
         type: DataTypes.DECIMAL,
         allowNull: true
     },
@@ -37,7 +36,7 @@ Plan.init({
         type: DataTypes.TEXT,
         allowNull: false
     },
-    valid_until:{
+    valid_until: {
         type: DataTypes.DATE,
         allowNull: true,
     },
@@ -63,8 +62,5 @@ Plan.init({
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
 });
-
-User.belongsToMany(Plan, {through:UserHasPlan, foreignKey: 'use_id', otherKey: 'pla_id'});
-Plan.belongsToMany(User, {through:UserHasPlan, foreignKey: 'pla_id', otherKey: 'use_id'});
 
 module.exports = Plan;

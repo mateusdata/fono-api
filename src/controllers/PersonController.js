@@ -1,5 +1,4 @@
 const Person = require('../models/Person');
-const UserHasPerson = require('../models/PersonHasUser');
 const { z, ZodError } = require('zod');
 const dayjs = require('dayjs');
 
@@ -58,18 +57,6 @@ class PersonController {
             console.log(error)
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
-    }
-
-    async linkPersonToUser(req, res) {
-        const { use_id, per_id } = req.body
-
-        try {
-            return res.status(200).send(await UserHasPerson.create({ use_id, per_id }));
-        } catch (error) {
-            console.log(error);
-            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
-        }
-
     }
 
     async info(req, res) {

@@ -5,6 +5,7 @@ const EmailController = require('./EmailController');
 const sequelize = require('../config/sequelize');
 const { z, ZodError } = require('zod');
 const Doctor = require('../models/Doctor');
+const stripe = require('../services/stripeClient');
 
 class UserController {
 
@@ -37,7 +38,12 @@ class UserController {
 
       await t.commit();
 
+
       const userDoc = await user.reload({ include: Doctor });
+      const costumer = await stripe.createCostumer(userDoc.use_id);
+
+      console.log(costumer);
+      user.update({ client_id: costumer?.client_id });
 
       return res.send({ token, user_id: userDoc.get('use_id'), nick_name: userDoc.get('nick_name'), doc_id: userDoc.get('doctor').get('doc_id'), message: 'User has been created' });
     } catch (error) {
@@ -62,7 +68,7 @@ class UserController {
 
       const updated = await user.update(updateSchema.parse(req.body));
 
-      if(!updated){
+      if (!updated) {
         return res.status(403).send({ message: 'User not updated' })
       }
 
