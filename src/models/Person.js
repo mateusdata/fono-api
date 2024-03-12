@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
+const User = require('./User');
 
 class Person extends Model { }
 
@@ -8,6 +9,14 @@ Person.init({
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
+  },
+  use_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      modelName: User,
+      key: 'use_id'
+    }
   },
   first_name: {
     type: DataTypes.STRING(50),
@@ -41,13 +50,15 @@ Person.init({
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
-  indexes:[
+  indexes: [
     {
       name: 'person_first_name_last_name_cpf_idx',
-      fields:['first_name', 'last_name', 'cpf']
+      fields: ['first_name', 'last_name', 'cpf']
     }
   ]
 });
 
+User.hasOne(Person, { foreignKey: 'use_id', sourceKey: 'use_id' });
+Person.belongsTo(User, { foreignKey: 'use_id', targetKey: 'use_id' })
 
 module.exports = Person;

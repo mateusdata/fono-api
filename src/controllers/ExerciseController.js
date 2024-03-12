@@ -8,10 +8,11 @@ class ExerciseController {
     async create(req, res) {
         const createSchema = z.object({
             name: z.string().max(150),
+            alternative_names: z.string().max(60).array(),
             mus_id: z.number().int().positive().optional(),
             status: z.enum(['active', 'banned', 'inactive']).optional(),
-            objective: z.string().max(250),
-            description: z.string().max(250),
+            objective: z.string().max(400),
+            description: z.string().max(400),
             video_urls: z.array(z.string().max(150)),
             academic_sources: z.array(z.string().max(150))
         })

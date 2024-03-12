@@ -33,7 +33,6 @@ router.post('/update-user/:id', UserController.update);
 
 router.post('/create-person', PersonController.create);
 router.get('/info-person/:id', PersonController.info);
-router.post('/link-person-to-user', PersonController.linkPersonToUser);
 
 router.post('/create-doctor', DoctorController.create);
 router.get('/info-doctor/:id', DoctorController.info);
