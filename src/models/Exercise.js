@@ -15,7 +15,7 @@ Exercise.init({
     },
     alternative_names: {
         type: DataTypes.ARRAY(DataTypes.STRING(60)),
-        allowNull: false,
+        allowNull: true,
     },
     description: {
         type: DataTypes.TEXT,
