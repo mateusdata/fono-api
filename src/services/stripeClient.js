@@ -1,3 +1,4 @@
+const { Client } = require('pg');
 const Person = require('../models/Person');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
@@ -26,6 +27,41 @@ class CustomStipe {
             console.log(error);
             return null;
         }       
+    }
+
+    async createCard(use_id, exp_month, exp_year, card_number, cvc) {
+
+        const user = await User.findByPk(use_id,{
+            include: [Person, Client],
+            require: true
+        })
+
+        const customerSource = await stripe.customers.createSource(
+            user.client.client_id,
+            { 
+                exp_month: exp_month,
+                exp_year: exp_year,
+                number: card_number,
+                cvc: cvc,
+                object: 'card',
+                address_city: person.address.city,
+                address_country: person.address.country,
+                address_line1: person.address.line1,
+                address_line2: person.address.line2,
+                address_zip: person.address.zip_code,
+                name: person.first_name + person.last_name
+            }
+        );
+
+        return customerSource;
+    }
+    
+    async getPrices() {
+        const prices = await stripeClient.prices.list({
+            expand: ['data.product']
+        });
+
+        return prices.data;
     }
 
     getRaw() {

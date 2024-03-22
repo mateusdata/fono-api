@@ -43,12 +43,12 @@ class UserController {
       const costumer = await stripe.createCostumer(userDoc.use_id);
 
       console.log(costumer);
-      user.update({ client_id: costumer?.client_id });
+      await userDoc.createCostumer({costumer_id: costumer.id, invoice_prefix: costumer.invoice_prefix});
 
       return res.send({ token, user_id: userDoc.get('use_id'), nick_name: userDoc.get('nick_name'), doc_id: userDoc.get('doctor').get('doc_id'), message: 'User has been created' });
     } catch (error) {
-      console.log(error);
       await t.rollback();
+      console.log(error);
       return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
   }

@@ -1,12 +1,14 @@
 const stripe = require("../services/stripeClient");
 const User = require('../models/User');
 const Person = require('../models/Person');
+const Costumer = require("../models/Costumer");
 
 class PaymentGatewayController {
 
-    async createCostumer(req, res){
+    async createCostumer(req, res) {
         const user = await User.findByPk(req.params.id, {
             include: Person,
+            required: true
         });
 
         const customer = await stripe.customers.create({
@@ -16,33 +18,34 @@ class PaymentGatewayController {
     }
 
     async subscribe(req, res) {
-        const user = await User.findByPk(req.params.id);
-        
+        const { price_id } = req.body;
+
+        const user = await User.findByPk(req.params.id, {
+            include: {
+                include: Costumer,
+                required: true
+            }
+        });
+
+        if (!user) {
+            return res.status(404).send({ message: 'User doesn\'t exists' });
+        }
+
         const subscription = await stripe.getRaw().subscriptions.create({
             customer: user.costumer_id,
             items: [
                 {
-                    price: req.body.price_id,
+                    price: price_id,
                 },
             ],
             trial_end: 1610403705,
         });
+
+        return res.status(404).send({ message: 'Subscription could not be created' })
     }
-    
+
     async listPlans(req, res) {
-        const plans = await stripe.getRaw().products.list({
-            limit: 3,
-        });
-
-        console.log(typeof plans);
-        for (let index = 0; index < plans.data.length; index++) {
-            if (plans.data[index]?.default_price) {
-                const price = await stripe.getRaw().prices.retrieve(plans.data[index].default_price);
-                console.log(price);
-                plans.data[index] = Object({ ...plans.data[index], price: price });
-            }
-
-        }
+        const plans = await stripe.getPrices();
 
         res.status(200).send(plans);
     }
