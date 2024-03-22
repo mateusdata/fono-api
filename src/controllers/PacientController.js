@@ -16,7 +16,12 @@ class PacientController {
             first_name: z.string().max(150),
             last_name: z.string().max(150),
             cpf: z.string().length(11)/*.refine(cpfValidation, { message: 'Invalid cpf number' })*/,
-            birthday: z.string().max(25)//.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/
+            birthday: z.string().max(25)/*.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/,
+            base_diseases: z.string().max(300),
+            consultation_reason: z.string().max(300),
+            food_profile: z.string().max(300),
+            chewing_complaint: z.string().max(300),
+            education : z.string().max(300),
         });
         const t = await sequelize.transaction();
 
@@ -24,6 +29,7 @@ class PacientController {
 
             const pacient = await Pacient.create({
                 status: 'active',
+                ...createSchema.parse(req.body),
                 person: { ...createSchema.parse(req.body) },
             }, {
                 include: Pacient.Person,
@@ -37,6 +43,7 @@ class PacientController {
             }
         } catch (error) {
             await t.rollback();
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
@@ -46,6 +53,11 @@ class PacientController {
         const updateSchema = z.object({
             first_name: z.string().max(150).optional(),
             last_name: z.string().max(150).optional(),
+            base_diseases: z.string().max(300),
+            consultation_reason: z.string().max(300),
+            food_profile: z.string().max(300),
+            chewing_complaint: z.string().max(300),
+            education : z.string().max(300),
         });
 
         try {
@@ -163,15 +175,17 @@ class PacientController {
 
     async currentProtocol(req, res){
 
-        const protocols = await Pacient.findByPk(req.params.id, {
+        const protocol = await Pacient.findByPk(req.params.id, {
             include:{
                 model:Session,
                 include:{
                     model: Protocol,
                     include: {
                         model: ExercisePlan,
-                        include: Exercise
-                    }
+                        include: Exercise,
+                        required: true
+                    },
+                    required: true
                 },
                 limit:1,
             }
@@ -179,7 +193,7 @@ class PacientController {
         });
 
 
-        return res.status(200).send(protocols);
+        return res.status(200).send(protocol);
     }
 }
 

@@ -17,6 +17,26 @@ Pacient.init({
       key: 'per_id'
     }
   },
+  base_diseases:{
+    type: DataTypes.TEXT(300),
+    allowNull: true,
+  },
+  consultation_reason:{
+    type: DataTypes.TEXT(300),
+    allowNull: true,
+  },
+  food_profile:{
+    type: DataTypes.TEXT(300),
+    allowNull: true,
+  },
+  chewing_complaint:{
+    type: DataTypes.TEXT(300),
+    allowNull: true,
+  },
+  education:{
+    type: DataTypes.TEXT(300),
+    allowNull: true,
+  },
   status: {
     type: DataTypes.ENUM,
     defaultValue: 'active',
