@@ -8,6 +8,10 @@ const Doctor = require('../models/Doctor');
 const { Op, Sequelize } = require('sequelize');
 const Session = require('../models/Session');
 const Exercise = require('../models/Exercise');
+const Questionnaire = require('../models/Questionnaire');
+const Answer = require('../models/Answer');
+const Question = require('../models/Question');
+const Section = require('../models/Section');
 
 class PacientController {
     async create(req, res) {
@@ -21,7 +25,7 @@ class PacientController {
             consultation_reason: z.string().max(300),
             food_profile: z.string().max(300),
             chewing_complaint: z.string().max(300),
-            education : z.string().max(300),
+            education: z.string().max(300),
         });
         const t = await sequelize.transaction();
 
@@ -57,7 +61,7 @@ class PacientController {
             consultation_reason: z.string().max(300),
             food_profile: z.string().max(300),
             chewing_complaint: z.string().max(300),
-            education : z.string().max(300),
+            education: z.string().max(300),
         });
 
         try {
@@ -82,14 +86,46 @@ class PacientController {
 
         try {
 
-            const pacient = await Pacient.findByPk(req.params.id, { include: Person });
+            const pacient = await Pacient.findByPk(req.params.id, {
+                include: [Person],
 
+            });
+
+            const questionnaires = await Questionnaire.findAll({
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                include: {
+                    model: Section,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
+                    required: true,
+                    include: {
+                        model: Question,
+                        attributes: { exclude: ['qhs_id', 'created_at', 'updated_at'] },
+                        required: true,
+                        include: {
+                            model: Answer,
+                            attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
+                            required: true,
+                            include: {
+                                model: Pacient,
+                                attributes: [],
+                                required: true,
+                                where: {
+                                    pac_id: req.params.id
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+    
             if (pacient) {
-                return res.status(200).send(pacient);
+                return res.status(200).send({...pacient.get(), questionnaires});
             }
 
             return res.status(400).send({ mensage: "Pacient not found" });
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -173,12 +209,12 @@ class PacientController {
         }
     }
 
-    async currentProtocol(req, res){
+    async currentProtocol(req, res) {
 
         const protocol = await Pacient.findByPk(req.params.id, {
-            include:{
-                model:Session,
-                include:{
+            include: {
+                model: Session,
+                include: {
                     model: Protocol,
                     include: {
                         model: ExercisePlan,
@@ -187,7 +223,7 @@ class PacientController {
                     },
                     required: true
                 },
-                limit:1,
+                limit: 1,
             }
 
         });
