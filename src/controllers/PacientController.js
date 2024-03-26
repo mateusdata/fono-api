@@ -8,6 +8,10 @@ const Doctor = require('../models/Doctor');
 const { Op, Sequelize } = require('sequelize');
 const Session = require('../models/Session');
 const Exercise = require('../models/Exercise');
+const Questionnaire = require('../models/Questionnaire');
+const Answer = require('../models/Answer');
+const Question = require('../models/Question');
+const Section = require('../models/Section');
 
 class PacientController {
     async create(req, res) {
@@ -16,7 +20,12 @@ class PacientController {
             first_name: z.string().max(150),
             last_name: z.string().max(150),
             cpf: z.string().length(11)/*.refine(cpfValidation, { message: 'Invalid cpf number' })*/,
-            birthday: z.string().max(25)//.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/
+            birthday: z.string().max(25)/*.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/,
+            base_diseases: z.string().max(300),
+            consultation_reason: z.string().max(300),
+            food_profile: z.string().max(300),
+            chewing_complaint: z.string().max(300),
+            education: z.string().max(300),
         });
         const t = await sequelize.transaction();
 
@@ -24,6 +33,7 @@ class PacientController {
 
             const pacient = await Pacient.create({
                 status: 'active',
+                ...createSchema.parse(req.body),
                 person: { ...createSchema.parse(req.body) },
             }, {
                 include: Pacient.Person,
@@ -37,6 +47,7 @@ class PacientController {
             }
         } catch (error) {
             await t.rollback();
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
@@ -46,6 +57,11 @@ class PacientController {
         const updateSchema = z.object({
             first_name: z.string().max(150).optional(),
             last_name: z.string().max(150).optional(),
+            base_diseases: z.string().max(300),
+            consultation_reason: z.string().max(300),
+            food_profile: z.string().max(300),
+            chewing_complaint: z.string().max(300),
+            education: z.string().max(300),
         });
 
         try {
@@ -70,14 +86,46 @@ class PacientController {
 
         try {
 
-            const pacient = await Pacient.findByPk(req.params.id, { include: Person });
+            const pacient = await Pacient.findByPk(req.params.id, {
+                include: [Person],
 
+            });
+
+            const questionnaires = await Questionnaire.findAll({
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                include: {
+                    model: Section,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
+                    required: true,
+                    include: {
+                        model: Question,
+                        attributes: { exclude: ['qhs_id', 'created_at', 'updated_at'] },
+                        required: true,
+                        include: {
+                            model: Answer,
+                            attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
+                            required: true,
+                            include: {
+                                model: Pacient,
+                                attributes: [],
+                                required: true,
+                                where: {
+                                    pac_id: req.params.id
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+    
             if (pacient) {
-                return res.status(200).send(pacient);
+                return res.status(200).send({...pacient.get(), questionnaires});
             }
 
             return res.status(400).send({ mensage: "Pacient not found" });
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -161,25 +209,27 @@ class PacientController {
         }
     }
 
-    async currentProtocol(req, res){
+    async currentProtocol(req, res) {
 
-        const protocols = await Pacient.findByPk(req.params.id, {
-            include:{
-                model:Session,
-                include:{
+        const protocol = await Pacient.findByPk(req.params.id, {
+            include: {
+                model: Session,
+                include: {
                     model: Protocol,
                     include: {
                         model: ExercisePlan,
-                        include: Exercise
-                    }
+                        include: Exercise,
+                        required: true
+                    },
+                    required: true
                 },
-                limit:1,
+                limit: 1,
             }
 
         });
 
 
-        return res.status(200).send(protocols);
+        return res.status(200).send(protocol);
     }
 }
 

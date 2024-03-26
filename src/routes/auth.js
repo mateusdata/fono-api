@@ -62,6 +62,7 @@ router.get('/info-pacient/:id', PacientController.info);
 router.post('/update-pacient/:id', PacientController.update);
 router.post('/protocol-to-pacient', PacientController.attachProtocol);
 router.post('/search-pacient', PacientController.search);
+router.get('/current-protocol/:id', PacientController.currentProtocol);
 
 router.post('/create-session', SessionController.create);
 router.post('/update-session/:id', SessionController.update);

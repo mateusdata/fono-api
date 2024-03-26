@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Plan = require("../models/Plan");
+const Costumer = require("../models/Costumer");
+const Subscription = require("../models/Subscription");
 
 //TODO add user to invoice if detected it has made its payments
 //TODO block some routes if it has not made the payments
@@ -23,15 +25,23 @@ const middlewarePayment = (req, res, next) => {
 
             req.id_token = decode.id_token;
 
-            const user = await User.findByPk(decode.id_token);
+            const user = await User.findByPk(decode.id_token,{include:{
+                model: Costumer,
+                include:{
+                    model: Subscription,
+                    require: true
+                },
+                require: true
+            }});
 
             if (!user) {
                 return res.status(403).json({ message: "Unauthorized" });
             }
 
-            if(user.subscription_status){
-                
+            if(user?.costumer?.subscription?.subscription_status != 'active' && user?.costumer?.subscription?.subscription_status != 'trialing'){
+                return res.status(403).json({ message: "Unauthorized" });
             }
+            
             next();
 
         });
