@@ -22,10 +22,10 @@ class PacientController {
             cpf: z.string().length(11)/*.refine(cpfValidation, { message: 'Invalid cpf number' })*/,
             birthday: z.string().max(25)/*.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/,
             base_diseases: z.string().max(300),
-            consultation_reason: z.string().max(300),
-            food_profile: z.string().max(300),
-            chewing_complaint: z.string().max(300),
-            education: z.string().max(300),
+            consultation_reason: z.string().max(300).optional(),
+            food_profile: z.string().max(300).optional(),
+            chewing_complaint: z.string().max(300).optional(),
+            education: z.string().max(300).optional(),
         });
         const t = await sequelize.transaction();
 
@@ -57,11 +57,11 @@ class PacientController {
         const updateSchema = z.object({
             first_name: z.string().max(150).optional(),
             last_name: z.string().max(150).optional(),
-            base_diseases: z.string().max(300),
-            consultation_reason: z.string().max(300),
-            food_profile: z.string().max(300),
-            chewing_complaint: z.string().max(300),
-            education: z.string().max(300),
+            base_diseases: z.string().max(300).optional(),
+            consultation_reason: z.string().max(300).optional(),
+            food_profile: z.string().max(300).optional(),
+            chewing_complaint: z.string().max(300).optional(),
+            education: z.string().max(300).optional(),
         });
 
         try {
