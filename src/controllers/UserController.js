@@ -5,7 +5,7 @@ const EmailController = require('./EmailController');
 const sequelize = require('../config/sequelize');
 const { z, ZodError } = require('zod');
 const Doctor = require('../models/Doctor');
-const stripe = require('../services/stripeClient');
+//const stripe = require('../services/stripeClient');
 
 class UserController {
 
