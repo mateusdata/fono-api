@@ -21,7 +21,7 @@ class PacientController {
             last_name: z.string().max(150),
             cpf: z.string().length(11)/*.refine(cpfValidation, { message: 'Invalid cpf number' })*/,
             birthday: z.string().max(25)/*.refine(validAge, { message: 'Age must be between 18 and 100 years old' })*/,
-            base_diseases: z.string().max(300),
+            base_diseases: z.string().max(300).optional(),
             consultation_reason: z.string().max(300).optional(),
             food_profile: z.string().max(300).optional(),
             chewing_complaint: z.string().max(300).optional(),
