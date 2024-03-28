@@ -92,7 +92,7 @@ class SessionController {
 
             return res.status(200).send({ message: 'Session could not be ended' });
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -127,7 +127,7 @@ class SessionController {
 
             return res.status(200).send(sessions);
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 

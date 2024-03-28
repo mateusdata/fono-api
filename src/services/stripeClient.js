@@ -24,7 +24,7 @@ class CustomStipe {
             });
             return customer;
         }catch(error){
-            console.log(error);
+            
             return null;
         }       
     }

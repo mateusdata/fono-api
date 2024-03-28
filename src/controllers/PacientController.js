@@ -47,7 +47,7 @@ class PacientController {
             }
         } catch (error) {
             await t.rollback();
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
@@ -77,7 +77,7 @@ class PacientController {
 
             return res.status(403).send({ message: 'Pacient could not be updated' });
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -118,14 +118,14 @@ class PacientController {
                 }
             });
 
-    
+
             if (pacient) {
-                return res.status(200).send({...pacient.get(), questionnaires});
+                return res.status(200).send({ ...pacient.get(), questionnaires });
             }
 
             return res.status(400).send({ mensage: "Pacient not found" });
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -204,32 +204,51 @@ class PacientController {
 
             return res.status(400).send({ mensage: 'Pacient not found' });
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
     async currentProtocol(req, res) {
 
-        const protocol = await Pacient.findByPk(req.params.id, {
-            include: {
-                model: Session,
-                include: {
-                    model: Protocol,
-                    include: {
-                        model: ExercisePlan,
-                        include: Exercise,
-                        required: true
-                    },
-                    required: true
-                },
-                limit: 1,
-            }
-
+        const listSchema = z.object({
+            pageSize: z.coerce.number().positive(),
+            page: z.coerce.number().positive(),
         });
 
+        try {
 
-        return res.status(200).send(protocol);
+            const { pageSize, page } = listSchema.parse(req.query);
+
+            const limit = pageSize; // number of records per page
+            const offset = (page - 1) * pageSize;
+
+            const protocol = await Pacient.findAndCountAll({
+                include: {
+                    model: Session,
+                    include: {
+                        model: Protocol,
+                        include: {
+                            model: ExercisePlan,
+                            include: Exercise,
+                            required: true
+                        },
+                        required: true
+                    },
+                    limit: 1,
+                },
+                where:{
+                    pac_id : req.params.id
+                }
+
+            });
+
+            return res.status(200).send(protocol);
+        } catch (error) {
+
+            
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
     }
 }
 

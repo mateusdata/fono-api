@@ -32,7 +32,7 @@ class ProtocolController {
 
             return res.status(400).send('Protocol could not be created');
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -59,7 +59,7 @@ class ProtocolController {
 
             return res.status(404).send({ message: 'Protocol not found' });
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }

@@ -25,7 +25,7 @@ class MuscleController {
             }
 
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -64,7 +64,7 @@ class MuscleController {
             return res.status(400).send({ mensage: "Muscle not found" });
         } catch (error) {
 
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 

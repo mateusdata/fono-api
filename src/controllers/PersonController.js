@@ -54,7 +54,6 @@ class PersonController {
 
             return res.status(409).send({message:''});
         } catch (error) {
-            console.log(error)
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }

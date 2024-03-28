@@ -1,6 +1,5 @@
 const { Model, DataTypes, NOW } = require('sequelize');
 const sequelize = require("../config/sequelize");
-const Protocol = require("./Protocol");
 const Pacient = require('./Pacient');
 
 class Session extends Model { }
@@ -29,11 +28,11 @@ Session.init({
         type: DataTypes.DATE,
         allowNull: true,
     },
-    duration:{
+    duration: {
         type: DataTypes.TIME,
         allowNull: true
     },
-    comments:{
+    comments: {
         type: DataTypes.TEXT,
         allowNull: true,
     },
@@ -53,5 +52,8 @@ Session.init({
     createdAt: 'created_at',
     updatedAt: 'updated_at',
 });
+
+Pacient.hasMany(Session, { foreignKey: 'pac_id', sourceKey: 'pac_id' });
+Session.belongsTo(Pacient, { foreignKey: 'pac_id', targetKey: 'pac_id' });
 
 module.exports = Session;

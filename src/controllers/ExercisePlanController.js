@@ -22,7 +22,7 @@ class ExercisePlanController {
 
             return res.status(403).send({ message: 'Exercise plan could not be created' });
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }

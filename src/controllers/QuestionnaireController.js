@@ -38,7 +38,6 @@ class QuestionnaireController {
 
             return res.status(400).send('Questionnaire could not be created');
         } catch (error) {
-            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -145,7 +144,7 @@ class QuestionnaireController {
 
             return res.status(200).send(nextQuestionnaire)
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -175,7 +174,7 @@ class QuestionnaireController {
             }
             return res.status(201).send(created);
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }

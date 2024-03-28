@@ -26,7 +26,7 @@ class ExerciseController {
             }
 
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -130,7 +130,7 @@ class ExerciseController {
 
             return res.status(400).send({ mensage: 'Exercise not found' });
         } catch (error) {
-            console.log(error);
+            
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -147,7 +147,6 @@ class ExerciseController {
             const limit = pageSize; // number of records per page
             const offset = (page - 1) * pageSize;
 
-            console.log(limit, offset);
             const exercises = await Exercise.findAndCountAll({
                 include: {
                     model: Muscle,
