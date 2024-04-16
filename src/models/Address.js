@@ -2,10 +2,10 @@ const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 const Person = require('./Person');
 
-class Pacient extends Model { }
+class Address extends Model { }
 
-Pacient.init({
-  pac_id: {
+Address.init({
+  add_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
@@ -17,25 +17,29 @@ Pacient.init({
       key: 'per_id'
     }
   },
-  base_diseases:{
-    type: DataTypes.TEXT(300),
-    allowNull: true,
+  city: {
+    type: DataTypes.STRING(20),
+    allowNull: false
   },
-  consultation_reason:{
-    type: DataTypes.TEXT(300),
-    allowNull: true,
+  state: {
+    type: DataTypes.STRING(20),
+    allowNull: false
   },
-  food_profile:{
-    type: DataTypes.TEXT(300),
-    allowNull: true,
+  country: {
+    type: DataTypes.STRING(20),
+    allowNull: false
   },
-  chewing_complaint:{
-    type: DataTypes.TEXT(300),
-    allowNull: true,
+  line1 :{
+    type: DataTypes.STRING(150),
+    allowNull: false
   },
-  education:{
-    type: DataTypes.TEXT(300),
-    allowNull: true,
+  line2 :{
+    type: DataTypes.STRING(150),
+    allowNull: false
+  },
+  zip_code :{
+    type: DataTypes.STRING(8),
+    allowNull: false
   },
   status: {
     type: DataTypes.ENUM,
@@ -50,16 +54,19 @@ Pacient.init({
     type: DataTypes.DATE,
     allowNull: true,
   },
+  deleted_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 }, {
   sequelize,
-  modelName: 'pacient',
-  tableName: 'pacient',
+  modelName: 'address',
+  tableName: 'address',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  deletedAt: 'deleted_at',
 });
 
-Pacient.Person = Pacient.belongsTo(Person, { foreignKey: 'per_id', targetKey: 'per_id' });
-Person.Pacient = Person.hasOne(Pacient, { foreignKey: 'per_id', sourceKey: 'per_id' });
 
-module.exports = Pacient;
+module.exports = Address;

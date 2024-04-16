@@ -14,9 +14,9 @@ const ProtocolController = require('../controllers/ProtocolController');
 const PacientController = require('../controllers/PacientController');
 const SessionController = require('../controllers/SessionController');
 const QuestionnaireController = require('../controllers/QuestionnaireController');
-const PlanController = require('../controllers/PlanController');
 const PaymentGatewayController = require('../controllers/PaymentGatewayController')
 const middlewarePayment = require('../middleware/payment');
+const AddressController = require('../controllers/AddressController');
 
 router.post('/login', AuthController.login);
 router.post('/send-reset-code', PasswordResetController.sendResetCode);
@@ -33,6 +33,7 @@ router.post('/update-user/:id', UserController.update);
 
 router.post('/create-person', PersonController.create);
 router.get('/info-person/:id', PersonController.info);
+router.post('/create-address/:id', AddressController.create);
 
 router.post('/create-doctor', DoctorController.create);
 router.get('/info-doctor/:id', DoctorController.info);
@@ -83,15 +84,22 @@ router.get('/answered-questionnaire/:qus_id/:pac_id', QuestionnaireController.an
 router.get('/answered-questionnaire/:pac_id', QuestionnaireController.allAnsweredQuestionnaireForPacient)
 router.get('/next-questionnaire/:id', QuestionnaireController.nextQuestionnaire);
 
-router.post('/create-plan', PlanController.create);
-router.get('/info-plan/:id', PlanController.info);
-router.post('/update-plan/:id', PlanController.update);
-router.get('/available-plans', PlanController.availablePlans);
-router.get('/set-user-plan/:use_id/:pla_id', PlanController.setUserPlan);
-
 router.post('/webhook', PaymentGatewayController.webhook);
 router.get('/list-plans', PaymentGatewayController.listPlans);
 
+
+// Fetch the Checkout Session to display the JSON result on the success page
+router.get("/checkout-session", PaymentGatewayController.retrieveCheckout);
+
+router.post("/create-checkout-session", PaymentGatewayController.createSession);
+
+router.get("/config", (req, res) => {
+    res.send({
+        publishable_key: process.env.STRIPE_PUBLISHABLE_KEY,
+    });
+});
+
+router.post('/customer-portal', PaymentGatewayController.costumerPortal);
 router.get('/islogged', middlewareUser, AuthController.isLogged);
 
 

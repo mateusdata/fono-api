@@ -49,7 +49,6 @@ class PacientController {
             }
         } catch (error) {
             await t.rollback();
-
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 

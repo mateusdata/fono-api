@@ -67,8 +67,8 @@ Card.init({
     },
 }, {
     sequelize,
-    modelName: 'costumer',
-    tableName: 'costumer',
+    modelName: 'card',
+    tableName: 'card',
     timestamps: true,
     paranoid: true,
     createdAt: 'created_at',

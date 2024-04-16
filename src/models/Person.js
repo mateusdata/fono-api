@@ -1,6 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 const User = require('./User');
+const Address = require('./Address');
 
 class Person extends Model { }
 
@@ -59,6 +60,9 @@ Person.init({
 });
 
 User.hasOne(Person, { foreignKey: 'use_id', sourceKey: 'use_id' });
-Person.belongsTo(User, { foreignKey: 'use_id', targetKey: 'use_id' })
+Person.belongsTo(User, { foreignKey: 'use_id', targetKey: 'use_id' });
+
+Address.belongsTo(Person, { foreignKey: 'per_id', targetKey: 'per_id' });
+Person.hasOne(Address, { foreignKey: 'per_id', sourceKey: 'per_id' });
 
 module.exports = Person;
