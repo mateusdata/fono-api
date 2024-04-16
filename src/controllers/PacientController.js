@@ -12,6 +12,8 @@ const Questionnaire = require('../models/Questionnaire');
 const Answer = require('../models/Answer');
 const Question = require('../models/Question');
 const Section = require('../models/Section');
+const PDFDocument = require('pdfkit');
+const dayjs = require('dayjs');
 
 class PacientController {
     async create(req, res) {
@@ -51,7 +53,7 @@ class PacientController {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
-    }
+    }PDFDocument
 
     async update(req, res) {
         const updateSchema = z.object({
