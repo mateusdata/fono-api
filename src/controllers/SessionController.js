@@ -112,16 +112,14 @@ class SessionController {
                 limit: limit,
                 offset: offset,
                 attributes: { exclude: ['created_at', 'updated_at'] },
+                include:{
+                    model: Protocol,
+                    where:{
+                        doc_id: req.params.doc_id,
+                    }
+                },
                 where: {
-                    [Op.or]: [
-                        {
-                            pac_id: req.params.pac_id,
-                        },
-                        {
-                            doc_id: req.params.doc_id
-                        }
-                    ],
-                    pac_id: req.query.pac_id
+                    pac_id: req.params.pac_id,
                 }
             });
 

@@ -40,9 +40,6 @@ class UserController {
 
 
       const userDoc = await user.reload({ include: Doctor });
-      const costumer = await stripe.createCostumer(userDoc.use_id);
-      
-      await userDoc.createCostumer({costumer_id: costumer.id, invoice_prefix: costumer.invoice_prefix});
 
       return res.send({ token, user_id: userDoc.get('use_id'), nick_name: userDoc.get('nick_name'), doc_id: userDoc.get('doctor').get('doc_id'), message: 'User has been created' });
     } catch (error) {

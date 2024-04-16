@@ -70,7 +70,7 @@ router.post('/create-session', SessionController.create);
 router.post('/update-session/:id', SessionController.update);
 router.get('/end-session/:id', SessionController.end);
 router.get('/info-session/:id', SessionController.info);
-router.get('/last-sessions', SessionController.lastSessions);
+router.get('/last-sessions/:pac_id/:doc_id', SessionController.lastSessions);
 
 router.post('/create-protocol', ProtocolController.create);
 router.get('/info-protocol/:id', ProtocolController.info);
