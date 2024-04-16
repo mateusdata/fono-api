@@ -250,6 +250,135 @@ class PacientController {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
+
+
+    async generateReport(req, res) {
+        const width = 595.28;
+        const height = 841.89;
+
+        res.setHeader('Content-disposition', 'attachment; filename=test.pdf')
+        res.setHeader('Content-type', 'application/pdf')
+
+        let pdfDoc = new PDFDocument({
+            size: 'A4',
+            info: {
+                Title: "Relatório Fonotherapp",
+                Subject: "Relatório contendo informações básicas sobre o paciente e os questionários de análise funcional e estrutural",
+                Author: "Fonotherapp Inc."
+            },
+            margins: {
+                left: 60,
+                top: 40,
+                right: 40,
+                bottom: 40,
+            },
+        });
+
+        // Add margin squares
+        pdfDoc.on('pageAdded', () => {
+            pdfDoc.rect(30, 30, width - 60, height - 60).stroke();
+        });
+
+        const { outline } = pdfDoc;
+
+        pdfDoc.pipe(res);
+
+        const pacient = await Pacient.findByPk(req.params.id, {
+            include: [Person]
+        });
+
+        if (!pacient) {
+            return res.status(404).send({ message: 'Person not found' });
+        }
+
+        const questionnaires = await Questionnaire.findAll({
+            attributes: { exclude: ['created_at', 'updated_at'] },
+            include: {
+                model: Section,
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                required: true,
+                include: {
+                    model: Question,
+                    attributes: { exclude: ['qhs_id', 'created_at', 'updated_at'] },
+                    required: true,
+                    include: {
+                        model: Answer,
+                        attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
+                        required: true,
+                        include: {
+                            model: Pacient,
+                            attributes: [],
+                            required: true,
+                            where: {
+                                pac_id: req.params.id
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        pdfDoc.moveDown();
+        pdfDoc.font('Helvetica').fontSize(25).fillColor('black').text('Relatório Fono', {
+            align: 'center'
+        });
+        outline.addItem("Início");
+        pdfDoc.rect(30, 30, width - 60, height - 60).stroke();
+
+        pdfDoc.translate(50, (height - 500) / 2)
+            .path('M 250,75 L 323,301 131,161 369,161 177,301 z')
+            .fill('non-zero');
+
+        /*
+        pdfDoc.image('/home/iky/Pictures/fono_1.jpeg', {
+            align: "center",
+        });
+        */
+
+
+        pdfDoc.addPage();
+
+        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text('Nome: ' + pacient.person.first_name);
+        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text('Cpf: ' + pacient.person.cpf);
+        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text('Data Nascimento: ' + dayjs(pacient.person.birthday).format('DD/MM/YYYY'));
+        pdfDoc.moveDown();
+        outline.addItem('Anamnese', { expanded: true });
+        pdfDoc.font('Helvetica').fontSize(16).fillColor('black').text('Anamnese');
+        pdfDoc.moveDown();
+        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text('Educação: ' + pacient.education);
+        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text('Doenças básicas: ' + pacient.base_diseases);
+        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text('Razão da consulta: ' + pacient.consultation_reason);
+        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text('Perfil alimentar: ' + pacient.food_profile);
+        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text('Reclamações de deglutição: ' + pacient.chewing_complaint);
+        pdfDoc.moveDown(2);
+
+
+
+        questionnaires.forEach(questionnaire => {
+            outline.addItem(questionnaire.name);
+            pdfDoc.font('Helvetica').fontSize(16).fillColor('black').text(questionnaire.name);
+
+            questionnaire.sections.forEach(section => {
+
+                pdfDoc.font('Helvetica').fontSize(14).fillColor('black').text(section.name);
+                pdfDoc.moveDown();
+                section.questions.forEach(question => {
+                    pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text(question.name + ":");
+                    question.alternatives.forEach(alternative => {
+                        pdfDoc.font('Helvetica').fontSize(12).fillColor('black').text((question.answer.alternative != alternative ? '[  ]' : '[x]') + '  ' + alternative, {
+                            indent: 10
+                        });
+                    });
+                    pdfDoc.moveDown();
+                });
+
+            })
+        });
+
+
+        pdfDoc.end();
+    }
+
 }
 
 module.exports = new PacientController();

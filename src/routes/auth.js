@@ -99,7 +99,7 @@ router.get("/config", (req, res) => {
     });
 });
 
-router.post('/customer-portal', PaymentGatewayController.costumerPortal);
+//router.post('/customer-portal', PaymentGatewayController.costumerPortal);
 router.get('/islogged', middlewareUser, AuthController.isLogged);
 
 
