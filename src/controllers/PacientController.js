@@ -16,6 +16,7 @@ const PDFDocument = require('pdfkit');
 const dayjs = require('dayjs');
 
 class PacientController {
+
     async create(req, res) {
         const createSchema = z.object({
             doc_id: z.number().positive(),
@@ -53,7 +54,7 @@ class PacientController {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 
-    }PDFDocument
+    }
 
     async update(req, res) {
         const updateSchema = z.object({
@@ -252,7 +253,6 @@ class PacientController {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
-
 
     async generateReport(req, res) {
         const width = 595.28;

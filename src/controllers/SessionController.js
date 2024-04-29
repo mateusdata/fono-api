@@ -6,6 +6,9 @@ const Protocol = require('../models/Protocol');
 const ExercisePlan = require('../models/ExercisePlan');
 const Exercise = require('../models/Exercise');
 const { Op } = require('sequelize');
+const User = require('../models/User');
+const Doctor = require('../models/Doctor');
+const whois = require('../services/IdentityService');
 
 dayjs.extend(duration);
 
@@ -19,7 +22,8 @@ class SessionController {
 
 
         try {
-            const session = await Session.create(createSchema.parse(req.body));
+            const user = await User.findByPk(whois(req), { include: [Doctor] });
+            const session = await Session.create({ ...createSchema.parse(req.body), doc_id: user?.doctor?.doc_id });
 
             if (session) {
                 return res.status(200).send(session);
@@ -92,7 +96,7 @@ class SessionController {
 
             return res.status(200).send({ message: 'Session could not be ended' });
         } catch (error) {
-            
+
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -108,14 +112,16 @@ class SessionController {
             const limit = pageSize; // number of records per page
             const offset = (page - 1) * pageSize;
 
+            const user = await User.findByPk(whois(req), { include: [Doctor] });
+
             const sessions = await Session.findAndCountAll({
                 limit: limit,
                 offset: offset,
                 attributes: { exclude: ['created_at', 'updated_at'] },
-                include:{
+                include: {
                     model: Protocol,
-                    where:{
-                        doc_id: req.params.doc_id,
+                    where: {
+                        doc_id: user?.doctor?.doc_id,
                     }
                 },
                 where: {
@@ -125,7 +131,7 @@ class SessionController {
 
             return res.status(200).send(sessions);
         } catch (error) {
-            
+
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 

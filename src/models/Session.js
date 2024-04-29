@@ -1,6 +1,7 @@
 const { Model, DataTypes, NOW } = require('sequelize');
 const sequelize = require("../config/sequelize");
 const Pacient = require('./Pacient');
+const Doctor = require('./Doctor');
 
 class Session extends Model { }
 
@@ -13,10 +14,18 @@ Session.init({
     },
     pac_id: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
             model: Pacient,
             key: 'pac_id'
+        }
+    },
+    doc_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: Doctor,
+            key: 'doc_id'
         }
     },
     begin: {
@@ -55,5 +64,8 @@ Session.init({
 
 Pacient.hasMany(Session, { foreignKey: 'pac_id', sourceKey: 'pac_id' });
 Session.belongsTo(Pacient, { foreignKey: 'pac_id', targetKey: 'pac_id' });
+
+Doctor.hasMany(Session, { foreignKey: 'doc_id', sourceKey: 'doc_id' });
+Session.belongsTo(Doctor, { foreignKey: 'doc_id', targetKey: 'doc_id' });
 
 module.exports = Session;

@@ -7,7 +7,6 @@ const ExercisePlan = require('../models/ExercisePlan');
 class ProtocolController {
     async create(req, res) {
         const createSchema = z.object({
-            doc_id: z.number().int().positive(),
             ses_id: z.number().int().positive(),
             name: z.string().max(150),
             description: z.string().max(255),

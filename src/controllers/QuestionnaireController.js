@@ -6,6 +6,9 @@ const QuestionnaireSection = require('../models/Section');
 const Section = require('../models/Section');
 const Pacient = require('../models/Pacient');
 const { Op } = require('sequelize');
+const Doctor = require('../models/Doctor');
+const User = require('../models/User');
+const whois = require('../services/IdentityService');
 
 class QuestionnaireController {
     async create(req, res) {
@@ -38,6 +41,7 @@ class QuestionnaireController {
 
             return res.status(400).send('Questionnaire could not be created');
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -144,7 +148,7 @@ class QuestionnaireController {
 
             return res.status(200).send(nextQuestionnaire)
         } catch (error) {
-            
+
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -162,24 +166,27 @@ class QuestionnaireController {
             const { pac_id, answers } = answerSchema.parse(req.body);
 
             const pacient = await Pacient.findByPk(pac_id);
+            const user = await User.findByPk(whois(req), { include: [Doctor] });
 
             if (!pacient) {
                 res.status(404).send({ message: 'Pacient not found' });
             }
-
-            const created = await Answer.bulkCreate(answers.map((element) => Object({ pac_id, ...element })));
+       
+            const created = await Answer.bulkCreate(answers.map((element) => Object({ ...element, pac_id: pacient.pac_id, doc_id: user?.doctor?.doc_id })));
 
             if (!created) {
                 return res.status(422).send({ message: "Could not save answers" });
             }
             return res.status(201).send(created);
         } catch (error) {
-            
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
     async answeredQuestionnaire(req, res) {
+
+        const user = await User.findByPk(whois(req), { include: [Doctor] });
 
         const questionnaire = await Questionnaire.findByPk(req.params.qus_id, {
             attributes: { exclude: ['created_at', 'updated_at'] },
@@ -192,6 +199,9 @@ class QuestionnaireController {
                     include: {
                         model: Answer,
                         attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
+                        where:{
+                            doc_id: user?.doctor?.doc_id
+                        },
                         include: {
                             model: Pacient,
                             attributes: [],
@@ -209,6 +219,8 @@ class QuestionnaireController {
 
     async allAnsweredQuestionnaireForPacient(req, res) {
 
+        const user = await User.findByPk(whois(req), { include: [Doctor] });
+        
         const questionnaire = await Questionnaire.findAll({
             attributes: { exclude: ['created_at', 'updated_at'] },
             include: {
@@ -223,6 +235,9 @@ class QuestionnaireController {
                         model: Answer,
                         attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
                         required: true,
+                        where:{
+                            doc_id: user?.doctor?.doc_id
+                        },
                         include: {
                             model: Pacient,
                             attributes: [],
