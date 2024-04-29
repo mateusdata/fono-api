@@ -4,9 +4,7 @@ const UserController = require('../controllers/UserController');
 const PersonController = require('../controllers/PersonController');
 const DoctorController = require('../controllers/DoctorController');
 
-const middlewareUser = require('../middleware/login');
-const AuthController = require('../controllers/AuthController');
-const PasswordResetController = require('../controllers/PasswordResetController');
+
 const ExerciseController = require('../controllers/ExerciseController');
 const MuscleController = require('../controllers/MuscleController');
 const ExercisePlanController = require('../controllers/ExercisePlanController');
@@ -14,15 +12,11 @@ const ProtocolController = require('../controllers/ProtocolController');
 const PacientController = require('../controllers/PacientController');
 const SessionController = require('../controllers/SessionController');
 const QuestionnaireController = require('../controllers/QuestionnaireController');
-const PaymentGatewayController = require('../controllers/PaymentGatewayController')
-const middlewarePayment = require('../middleware/payment');
+const ReportController = require('../controllers/ReportController');
 const AddressController = require('../controllers/AddressController');
 
-router.post('/login', AuthController.login);
-router.post('/send-reset-code', PasswordResetController.sendResetCode);
-router.post('/verify-reset-code', PasswordResetController.verifyResetCode);
-router.post('/reset-password', PasswordResetController.resetPassword);
-router.post('/create-user', UserController.createUser);
+//const middlewareUser = require('../middleware/login');
+//const middlewarePayment = require('../middleware/payment');
 
 //router.use(middlewareUser);
 
@@ -64,7 +58,6 @@ router.post('/update-pacient/:id', PacientController.update);
 router.post('/protocol-to-pacient', PacientController.attachProtocol);
 router.post('/search-pacient', PacientController.search);
 router.get('/current-protocol/:id', PacientController.currentProtocol);
-router.get('/generate-report/:id', PacientController.generateReport);
 
 router.post('/create-session', SessionController.create);
 router.post('/update-session/:id', SessionController.update);
@@ -80,28 +73,12 @@ router.post('/create-questionnaire', QuestionnaireController.create)
 router.get('/info-questionnaire/:id', QuestionnaireController.info);
 router.post('/update-questionnaire/:id', QuestionnaireController.update);
 router.post('/answer-questionnaire', QuestionnaireController.answerQuestionnaire);
-router.get('/answered-questionnaire/:qus_id/:pac_id', QuestionnaireController.answeredQuestionnaire)
-router.get('/answered-questionnaire/:pac_id', QuestionnaireController.allAnsweredQuestionnaireForPacient)
+router.get('/answered-questionnaire/:pac_id', QuestionnaireController.allAnsweredQuestionnaireForPacient);
 router.get('/next-questionnaire/:id', QuestionnaireController.nextQuestionnaire);
 
-router.post('/webhook', PaymentGatewayController.webhook);
-router.get('/list-plans', PaymentGatewayController.listPlans);
-
-
-// Fetch the Checkout Session to display the JSON result on the success page
-router.get("/checkout-session", PaymentGatewayController.retrieveCheckout);
-
-router.post("/create-checkout-session", PaymentGatewayController.createSession);
-
-router.get("/config", (req, res) => {
-    res.send({
-        publishable_key: process.env.STRIPE_PUBLISHABLE_KEY,
-    });
-});
-
-//router.post('/customer-portal', PaymentGatewayController.costumerPortal);
-router.get('/islogged', middlewareUser, AuthController.isLogged);
-
-
+router.post('/service-term/:id', ReportController.ServiceTerm);
+router.post('/follow-up-report/:id', ReportController.FollowupReport);
+router.get('/generate-report/:id', ReportController.PacientReport);
+router.post('/discharg-report/:pac_id', ReportController.DischargeReport);
 
 module.exports = router;

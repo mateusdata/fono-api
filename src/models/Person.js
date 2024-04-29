@@ -27,6 +27,15 @@ Person.init({
     type: DataTypes.STRING(50),
     allowNull: true,
   },
+  full_name: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return `${this.first_name} ${this.last_name}`;
+    },
+    set(value) {
+      throw new Error('Do not try to set the `fullName` value!');
+    },
+  },
   cpf: {
     type: DataTypes.STRING(11),
     allowNull: false,

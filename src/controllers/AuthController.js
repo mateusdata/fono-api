@@ -30,8 +30,8 @@ class AuthController {
 
 
       if (isValidUser) {
-        const token = jwt.sign({ id_token: user.id }, process.env.secretKey, {
-          expiresIn: '60s',
+        const token = jwt.sign({ id_token: user.use_id }, process.env.secretKey, {
+          expiresIn: '2d',
         });
 
         return res.send({ token, email: user.email, usu_id: user.use_id, doc_id: user.doctor.doc_id,  nick_name: user.nick_name });

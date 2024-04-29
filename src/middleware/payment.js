@@ -18,29 +18,34 @@ const middlewarePayment = (req, res, next) => {
 
         jwt.verify(token, process.env.secretKey, async (err, decode) => {
 
+
             if (err) {
                 return res.status(401).json({ message: "Token is invalid or expired" });
             }
 
+
             req.id_token = decode.id_token;
 
-            const user = await User.findByPk(decode.id_token,{include:{
-                model: Costumer,
-                include:{
-                    model: Subscription,
+            const user = await User.findByPk(decode.id_token, {
+                include: {
+                    model: Costumer,
+                    include: {
+                        model: Subscription,
+                        require: true
+                    },
                     require: true
-                },
-                require: true
-            }});
+                }
+            });
+
 
             if (!user) {
                 return res.status(403).json({ message: "Unauthorized" });
             }
 
-            if(user?.costumer?.subscription?.subscription_status != 'active' && user?.costumer?.subscription?.subscription_status != 'trialing'){
-                return res.status(403).json({ message: "Unauthorized" });
+            if (user?.costumer?.subscription?.subscription_status != 'active' && user?.costumer?.subscription?.subscription_status != 'trialing') {
+                return res.status(406).json({ message: "Conflict" });
             }
-            
+
             next();
 
         });
