@@ -43,6 +43,7 @@ class UserController {
 
       return res.send({ token, user_id: userDoc.get('use_id'), nick_name: userDoc.get('nick_name'), doc_id: userDoc.get('doctor').get('doc_id'), message: 'User has been created' });
     } catch (error) {
+      console.log(error);
       await t.rollback();
       
       return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
