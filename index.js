@@ -4,9 +4,10 @@ const cors = require("cors");
 const app = express();
 const AuthRouter = require("./src/routes/auth");
 const ApiRouter = require("./src/routes/api");
+const middlewareUser = require('./src/middleware/login');
 const port = process.env.PORT || 3000;
 var fs = require('fs');
-const middlewareUser = require('./src/middleware/login');
+
 app.set('trust proxy', 1);
 
 app.use(rateLimiter({
@@ -18,6 +19,7 @@ app.use(rateLimiter({
 
 app.use(express.json());
 app.use(cors());
+app.use("/", AuthRouter, middlewareUser);
 app.use("/", ApiRouter);
 
 app.get("/", async function (req, res) {
@@ -46,8 +48,6 @@ app.get('/total-videos', function(req, res) {
       }
   });
 });
-
-app.use("/", AuthRouter, middlewareUser);
 
 app.listen(port, () => {
    console.log("Servidor rodando na porta " + port);
