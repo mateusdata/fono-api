@@ -8,7 +8,6 @@ const Answer = require('../models/Answer');
 const Section = require('../models/Section');
 const S = require('string');
 var locale_pt_br = require('dayjs/locale/pt-br');
-const geoIp2 = require('geoip-lite2');
 const User = require('../models/User');
 const Doctor = require('../models/Doctor');
 const whois = require('../services/IdentityService');
@@ -173,7 +172,7 @@ class ReportController {
 
             const serviceOptions = serviceSchema.parse(req.body);
 
-            const geoIpLocation = geoIp2.lookup(req.ip);
+            //const geoIpLocation = geoIp2.lookup(req.ip);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
 
             const pacient = await Pacient.findByPk(req.params.id, {
@@ -229,7 +228,7 @@ class ReportController {
             }
 
             const dateInfo = {
-                city_name: geoIpLocation?.city || '____________________________',
+                city_name: '____________________________',
                 day: dayjs().format('DD'),
                 month_name: S(dayjs().locale(locale_pt_br).format('MMMM')).capitalize(),
                 year: dayjs().format('YYYY')
@@ -426,7 +425,7 @@ class ReportController {
             const DischargeReport = DischargeReportSchema.parse(req.body);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
             const pacient = await Pacient.findByPk(req.params.pac_id, { include: Person });
-            const geoIpLocation = geoIp2.lookup(req.ip);
+            //const geoIpLocation = geoIp2.lookup(req.ip);
 
             if (!pacient) {
                 return res.status(404).send({ message: 'Pacient has not been found' });
@@ -487,7 +486,7 @@ class ReportController {
 
             const cityTemplate = `{{city_name}}, {{day}} de {{month_name}} de {{year}}`;
             const cityData = {
-                city_name: geoIpLocation?.city || '_______________________',
+                city_name: '_______________________',
                 day: dayjs().format('DD'),
                 month_name: S(dayjs().locale(locale_pt_br).format('MMMM')).capitalize().toString(),
                 year: dayjs().format('YYYY')

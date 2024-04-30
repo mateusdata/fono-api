@@ -19,7 +19,6 @@ app.use(rateLimiter({
 
 app.use(express.json());
 app.use(cors());
-app.use("/", AuthRouter, middlewareUser);
 app.use("/", ApiRouter);
 
 app.get("/", async function (req, res) {
@@ -52,3 +51,5 @@ app.get('/total-videos', function(req, res) {
 app.listen(port, () => {
    console.log("Servidor rodando na porta " + port);
 });
+
+app.use("/", AuthRouter, middlewareUser);
