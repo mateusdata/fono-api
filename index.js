@@ -19,7 +19,9 @@ app.use(rateLimiter({
 
 app.use(express.json());
 app.use(cors());
-app.use("/", ApiRouter);
+
+app.use(ApiRouter);
+
 
 app.get("/", async function (req, res) {
   res.send("Fono");
@@ -48,8 +50,9 @@ app.get('/total-videos', function(req, res) {
   });
 });
 
+app.use(AuthRouter);
+
 app.listen(port, () => {
    console.log("Servidor rodando na porta " + port);
 });
 
-app.use("/", AuthRouter, middlewareUser);

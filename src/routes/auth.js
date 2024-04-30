@@ -15,10 +15,10 @@ const QuestionnaireController = require('../controllers/QuestionnaireController'
 const ReportController = require('../controllers/ReportController');
 const AddressController = require('../controllers/AddressController');
 
-//const middlewareUser = require('../middleware/login');
+const middlewareUser = require('../middleware/login');
 //const middlewarePayment = require('../middleware/payment');
 
-//router.use(middlewareUser);
+router.use(middlewareUser);
 
 //router.use(middlewarePayment);
 
