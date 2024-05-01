@@ -30,10 +30,11 @@ class PacientController {
             chewing_complaint: z.string().max(300).optional(),
             education: z.string().max(300).optional(),
         });
-        const t = await sequelize.transaction();
+
+        
 
         try {
-
+            const t = await sequelize.transaction();
             const pacient = await Pacient.create({
                 status: 'active',
                 ...createSchema.parse(req.body),
@@ -68,11 +69,14 @@ class PacientController {
         });
 
         try {
+            const t = await sequelize.transaction();
             const pacient = await Pacient.findByPk(req.params.id, { include: Person });
 
             await pacient?.update(updateSchema.parse(req.body));
 
             (await pacient?.getPerson()).update(updateSchema.parse(req.body));
+
+            await t.commit();
 
             if (pacient) {
                 return res.status(200).send(pacient);
@@ -80,7 +84,7 @@ class PacientController {
 
             return res.status(403).send({ message: 'Pacient could not be updated' });
         } catch (error) {
-            
+            await t.rollback();
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }

@@ -18,7 +18,7 @@ const AddressController = require('../controllers/AddressController');
 const middlewareUser = require('../middleware/login');
 //const middlewarePayment = require('../middleware/payment');
 
-router.use(middlewareUser);
+//router.use(middlewareUser);
 
 //router.use(middlewarePayment);
 

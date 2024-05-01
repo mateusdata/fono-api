@@ -22,7 +22,7 @@ Session.init({
     },
     doc_id: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         references: {
             model: Doctor,
             key: 'doc_id'

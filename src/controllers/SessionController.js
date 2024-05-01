@@ -9,6 +9,7 @@ const { Op } = require('sequelize');
 const User = require('../models/User');
 const Doctor = require('../models/Doctor');
 const whois = require('../services/IdentityService');
+const Pacient = require('../models/Pacient');
 
 dayjs.extend(duration);
 
@@ -22,13 +23,21 @@ class SessionController {
 
 
         try {
+            const { pac_id } = createSchema.parse(req.body);
+            const pacient = await Pacient.findByPk(pac_id);
             const user = await User.findByPk(whois(req), { include: [Doctor] });
-            const session = await Session.create({ ...createSchema.parse(req.body), doc_id: user?.doctor?.doc_id });
 
-            if (session) {
-                return res.status(200).send(session);
+            if (!pacient) {
+                return res.status(404).send({ message: 'Pacient not found' });
             }
 
+            const session = await Session.create({ ...createSchema.parse(req.body), doc_id: user?.doctor?.doc_id });
+
+            if (!session) {
+                return res.status(500).send({ message: 'Session could not be created' });
+            }
+
+            return res.status(200).send(session);
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
@@ -53,12 +62,11 @@ class SessionController {
                 attributes: { exclude: ['created_at', 'updated_at'] }
             });
 
-            if (session) {
-
-                return res.status(200).send(session);
+            if (!session) {
+                return res.status(404).send({ message: 'Session not found' });
             }
 
-            return res.status(404).send({ message: 'Session not found' });
+            return res.status(200).send(session);
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
@@ -73,11 +81,12 @@ class SessionController {
             const session = await Session.findByPk(req.params.id, { attributes: { exclude: ['created_at', 'updated_at'] }, having: { end: null } })
                 .then((ses) => ses.update(updateSchema.parse(req.body)));
 
-            if (session) {
-                return res.status(200).send(session);
+            if (!session) {
+                return res.status(403).send({ message: 'Session could not be created' });
             }
 
-            return res.status(403).send({ message: 'Session could not be created' });
+            return res.status(200).send(session);
+           
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
@@ -90,11 +99,11 @@ class SessionController {
             const session = await Session.findByPk(req.params.id, { attributes: { exclude: ['created_at', 'updated_at'] } })
                 .then((ses) => ses.update({ end: dayjs().toISOString(), duration: dayjs.duration(dayjs(new Date()).diff(ses.begin)).format('HH:mm:ss') }));
 
-            if (session) {
-                return res.status(200).send(session);
+            if (!session) {
+                return res.status(500).send({ message: 'Session could not be ended' });
             }
 
-            return res.status(200).send({ message: 'Session could not be ended' });
+            return res.status(200).send(session);
         } catch (error) {
 
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -119,19 +128,17 @@ class SessionController {
                 offset: offset,
                 attributes: { exclude: ['created_at', 'updated_at'] },
                 include: {
-                    model: Protocol,
-                    where: {
-                        doc_id: user?.doctor?.doc_id,
-                    }
+                    model: Protocol
                 },
                 where: {
                     pac_id: req.params.pac_id,
+                    doc_id: user?.doctor?.doc_id
                 }
             });
 
             return res.status(200).send(sessions);
         } catch (error) {
-
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
 

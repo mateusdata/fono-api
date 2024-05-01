@@ -11,14 +11,6 @@ Protocol.init({
         primaryKey: true,
         autoIncrement: true
     },
-    doc_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-            model: Doctor,
-            key: 'doc_id'
-        }
-    },
     ses_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -57,8 +49,6 @@ Protocol.init({
     updatedAt: 'updated_at',
 });
 
-Protocol.belongsTo(Doctor, { foreignKey: 'doc_id' });
-Doctor.hasMany(Protocol, { foreignKey: 'doc_id' });
 
 Session.hasOne(Protocol, { foreignKey: 'ses_id' });
 Protocol.belongsTo(Session, { foreignKey: 'ses_id' });

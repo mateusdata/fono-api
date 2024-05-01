@@ -5,7 +5,7 @@ const app = express();
 const AuthRouter = require("./src/routes/auth");
 const ApiRouter = require("./src/routes/api");
 const middlewareUser = require('./src/middleware/login');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 var fs = require('fs');
 
 app.set('trust proxy', 1);
