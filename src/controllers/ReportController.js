@@ -163,15 +163,16 @@ class ReportController {
         const height = 841.89;
 
         const serviceSchema = z.object({
-            price: z.number().positive(),
-            number_of_sessions: z.number().positive().int()
+            price: z.string().transform((value)=>Number(value)).pipe(z.number().positive())/*number().positive()*/,
+            number_of_sessions: z.string().transform((value)=>Number(value)).pipe(z.number().positive().int())/*number().positive().int()*/
         });
 
 
         try {
 
-            const serviceOptions = serviceSchema.parse(req.body);
+            const serviceOptions = serviceSchema.parse(req.query);
 
+            console.log(serviceOptions);
             //const geoIpLocation = geoIp2.lookup(req.ip);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
 
@@ -283,7 +284,7 @@ class ReportController {
 
         try {
 
-            const doctorAssessment = reportSchema.parse(req.body);
+            const doctorAssessment = reportSchema.parse(req.query);
 
             //const geoIpLocation = geoIp2.lookup(req.ip);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
@@ -422,7 +423,7 @@ class ReportController {
         const height = 841.89;
 
         try {
-            const DischargeReport = DischargeReportSchema.parse(req.body);
+            const DischargeReport = DischargeReportSchema.parse(req.query);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
             const pacient = await Pacient.findByPk(req.params.pac_id, { include: Person });
             //const geoIpLocation = geoIp2.lookup(req.ip);
