@@ -432,14 +432,14 @@ class ReportController {
                 return res.status(404).send({ message: 'Pacient has not been found' });
             }
 
-            res.setHeader('Content-disposition', filename('relatorio_acompanhamento', pacient))
+            res.setHeader('Content-disposition', filename('relatorio_de_alta', pacient))
             res.setHeader('Content-type', 'application/pdf')
 
             let pdfDoc = new PDFDocument({
                 size: 'A4',
                 info: {
-                    Title: "Relatório de Acompanhamento",
-                    Subject: "Relatório contendo dados de avaliação estrutural, funcional, parecer de deglutição, orientações geraism conclusão e encaminhamentos",
+                    Title: "Relatório de Alta",
+                    Subject: "Relatório contendo dados sobre o paciente e conclusoẽs para a alta do paciente",
                     Author: "Fonotherapp Inc."
                 },
                 margins: {
@@ -465,7 +465,7 @@ class ReportController {
 
             pdfDoc.moveDown(5);
             pdfDoc.fontSize(14);
-            pdfDoc.text('Relatório Acompanhamento', { align: 'center' });
+            pdfDoc.text('Relatório de Alta', { align: 'center' });
             pdfDoc.moveDown(5);
             const template = `Paciente {{pacient_name}}, {{pacient_age}}, {{medical_diagnoses}}. O tratamento fonoaudiológico teve início no dia {{treatment_begin_date}},  encontrava-se em uso de SNG/SNE/GTT ou ALIMENTAÇÃO EXCLUSIVA VIA ORAL, (DESCREVER COMO FOI ENCONTRADO) {{how_it_was_discovered}} (DESCREVER ACHADOS DA PRIMEIRA AVALIAÇÃO FONOAUDIOLÓGICA) {{first_session_findings}} (DESCREVER DIAGNÓSTICO(S) FONOAUDIOLÓGICO(S) E PLANO TERAPÊUTICO TRAÇADO COM OBJETIVOS PARA CADA ACHADO) {{therapeutic_plan}}
             (DESCREVER EVOLUÇÃO DO PACIENTE/RETIRADA DE VIA ALTERNATIVA DE ALIMENTAÇÃO, SE HOUVER {{patients_progress}} (DESCREVER COMO O PACIENTE ESTÁ NO MOMENTO ATUAL E DIAGNÓSTICO(S) ATUAL(IS) {{current_condition}}
@@ -474,7 +474,7 @@ class ReportController {
             const reportData = {
                 ...DischargeReport,
                 pacient_name: pacient?.person?.full_name,
-                pacient_age: 10,
+                pacient_age: dayjs().diff(pacient?.person?.birthday, 'years'),
                 treatment_begin_date: dayjs(pacient.created_at).format('DD/MM/YYYY'),
             };
 
