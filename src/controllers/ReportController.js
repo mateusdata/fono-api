@@ -13,6 +13,7 @@ const Doctor = require('../models/Doctor');
 const whois = require('../services/IdentityService');
 const { z, ZodError } = require('zod');
 const { formatPersonalId, personalIdType, filename, formatPhoneNumber } = require('../services/FormatterService');
+const geoLookup = require('../services/LocationService');
 
 
 
@@ -163,8 +164,10 @@ class ReportController {
         const height = 841.89;
 
         const serviceSchema = z.object({
-            price: z.string().transform((value)=>Number(value)).pipe(z.number().positive())/*number().positive()*/,
-            number_of_sessions: z.string().transform((value)=>Number(value)).pipe(z.number().positive().int())/*number().positive().int()*/
+            price: z.string().transform((value)=>Number(value)).pipe(z.number().positive()),
+            number_of_sessions: z.string().transform((value)=>Number(value)).pipe(z.number().positive().int()),
+            lat: z.string().transform((value)=>Number(value)).pipe(z.number()).optional(),
+            lon: z.string().transform((value)=>Number(value)).pipe(z.number()).optional(),
         });
 
 
@@ -173,7 +176,7 @@ class ReportController {
             const serviceOptions = serviceSchema.parse(req.query);
 
             console.log(serviceOptions);
-            //const geoIpLocation = geoIp2.lookup(req.ip);
+            const geoIpLocation = await geoLookup(serviceOptions.lat, serviceOptions.lon);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
 
             const pacient = await Pacient.findByPk(req.params.id, {
@@ -229,7 +232,7 @@ class ReportController {
             }
 
             const dateInfo = {
-                city_name: '____________________________',
+                city_name: geoIpLocation?.address?.town || '____________________________',
                 day: dayjs().format('DD'),
                 month_name: S(dayjs().locale(locale_pt_br).format('MMMM')).capitalize(),
                 year: dayjs().format('YYYY')
@@ -276,7 +279,7 @@ class ReportController {
             swallowing_assessment: z.string().max(500),
             general_guidelines: z.string().max(500),
             conclusion: z.string().max(500),
-            next_steps: z.string().max(500),
+            next_steps: z.string().max(500)
         });
 
         const width = 595.28;
@@ -417,6 +420,8 @@ class ReportController {
             patients_progress: z.string().max(500),
             current_condition: z.string().max(500),
             referrals: z.string().max(500),
+            lat: z.string().transform((value)=>Number(value)).pipe(z.number()).optional(),
+            lon: z.string().transform((value)=>Number(value)).pipe(z.number()).optional(),
         });
 
         const width = 595.28;
@@ -426,7 +431,7 @@ class ReportController {
             const DischargeReport = DischargeReportSchema.parse(req.query);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
             const pacient = await Pacient.findByPk(req.params.pac_id, { include: Person });
-            //const geoIpLocation = geoIp2.lookup(req.ip);
+            const geoIpLocation = await geoLookup(DischargeReport.lat, DischargeReport.lon);
 
             if (!pacient) {
                 return res.status(404).send({ message: 'Pacient has not been found' });
@@ -467,9 +472,8 @@ class ReportController {
             pdfDoc.fontSize(14);
             pdfDoc.text('Relatório de Alta', { align: 'center' });
             pdfDoc.moveDown(5);
-            const template = `Paciente {{pacient_name}}, {{pacient_age}}, {{medical_diagnoses}}. O tratamento fonoaudiológico teve início no dia {{treatment_begin_date}},  encontrava-se em uso de SNG/SNE/GTT ou ALIMENTAÇÃO EXCLUSIVA VIA ORAL, (DESCREVER COMO FOI ENCONTRADO) {{how_it_was_discovered}} (DESCREVER ACHADOS DA PRIMEIRA AVALIAÇÃO FONOAUDIOLÓGICA) {{first_session_findings}} (DESCREVER DIAGNÓSTICO(S) FONOAUDIOLÓGICO(S) E PLANO TERAPÊUTICO TRAÇADO COM OBJETIVOS PARA CADA ACHADO) {{therapeutic_plan}}
-            (DESCREVER EVOLUÇÃO DO PACIENTE/RETIRADA DE VIA ALTERNATIVA DE ALIMENTAÇÃO, SE HOUVER {{patients_progress}} (DESCREVER COMO O PACIENTE ESTÁ NO MOMENTO ATUAL E DIAGNÓSTICO(S) ATUAL(IS) {{current_condition}}
-            (ENCAMINHAMENTOS PARA OUTROS PROFISSIONAIS, SE HOUVER) {{referrals}}. À disposição, `;
+            const template = `Paciente {{pacient_name}}, {{pacient_age}} ano(s), {{medical_diagnoses}}. O tratamento fonoaudiológico teve início no dia {{treatment_begin_date}},  encontrava-se em uso de SNG/SNE/GTT ou ALIMENTAÇÃO EXCLUSIVA VIA ORAL, {{how_it_was_discovered}}. {{first_session_findings}}. {{therapeutic_plan}}.
+            {{patients_progress}}. {{current_condition}}. {{referrals}}. À disposição, `;
 
             const reportData = {
                 ...DischargeReport,
@@ -487,7 +491,7 @@ class ReportController {
 
             const cityTemplate = `{{city_name}}, {{day}} de {{month_name}} de {{year}}`;
             const cityData = {
-                city_name: '_______________________',
+                city_name: geoIpLocation?.address?.town || '_______________________',
                 day: dayjs().format('DD'),
                 month_name: S(dayjs().locale(locale_pt_br).format('MMMM')).capitalize().toString(),
                 year: dayjs().format('YYYY')
