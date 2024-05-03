@@ -232,7 +232,7 @@ class ReportController {
             }
 
             const dateInfo = {
-                city_name: geoIpLocation?.address?.town || '____________________________',
+                city_name: geoIpLocation?.address?.town || geoIpLocation?.address?.city || '____________________________',
                 day: dayjs().format('DD'),
                 month_name: S(dayjs().locale(locale_pt_br).format('MMMM')).capitalize(),
                 year: dayjs().format('YYYY')
@@ -491,7 +491,7 @@ class ReportController {
 
             const cityTemplate = `{{city_name}}, {{day}} de {{month_name}} de {{year}}`;
             const cityData = {
-                city_name: geoIpLocation?.address?.town || '_______________________',
+                city_name: geoIpLocation?.address?.town || geoIpLocation?.address?.city || '_______________________',
                 day: dayjs().format('DD'),
                 month_name: S(dayjs().locale(locale_pt_br).format('MMMM')).capitalize().toString(),
                 year: dayjs().format('YYYY')
