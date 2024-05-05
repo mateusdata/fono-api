@@ -3,13 +3,14 @@ const Pacient = require('../models/Pacient');
 const Person = require('../models/Person');
 const User = require('../models/User');
 const { z, ZodError } = require('zod');
+const { validateMedicalGovLicense } = require('../services/ValidateService');
 
 class DoctorController {
 
     async create(req, res) {
         const createSchema = z.object({
             use_id: z.number().int().positive(),
-            gov_license: z.number().int().positive().optional(),
+            gov_license: z.string().optional().transform((license) => license.replace(/\D/g, '')).refine(validateMedicalGovLicense, 'Invalid Medical License'),
         });
 
         try {
@@ -53,7 +54,7 @@ class DoctorController {
 
     async update(req, res) {
         const updateSchema = z.object({
-            gov_license: z.string().optional(),
+            gov_license: z.string().optional().transform((license) => license.replace(/\D/g, '')).refine(validateMedicalGovLicense, 'Invalid Medical License'),
         });
 
         try {
@@ -66,7 +67,6 @@ class DoctorController {
 
             return res.status(400).send({ mensage: 'Doctor not found' })
         } catch (error) {
-            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }

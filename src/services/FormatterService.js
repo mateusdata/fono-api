@@ -1,7 +1,3 @@
-const S = require('string');[
-
-
-]
 function filename(prefix, pacient){
     return `attachment; filename=${prefix}_${pacient?.person?.first_name}_${pacient?.person?.cpf}.pdf`.toLowerCase();
 }
