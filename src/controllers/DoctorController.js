@@ -4,6 +4,7 @@ const Person = require('../models/Person');
 const User = require('../models/User');
 const { z, ZodError } = require('zod');
 const { validateMedicalGovLicense } = require('../services/ValidateService');
+const { Op } = require('sequelize');
 
 class DoctorController {
 
@@ -23,7 +24,7 @@ class DoctorController {
             }
             return res.status(409).send({ message: 'Doctor could not be created' });
         } catch (error) {
-            
+
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -79,13 +80,47 @@ class DoctorController {
             include: {
                 model: Pacient,
                 attributes: { exclude: ['created_at', 'updated_at'] },
-                through: {
-                    attributes: []
-                },
-                include: { 
+                include: {
                     model: Person,
                     attributes: { exclude: ['created_at', 'updated_at'] },
-                  
+
+                }
+            }
+        });
+
+        return res.status(200).send(pacients);
+    }
+
+    async pacientsPendingBasicInfo(req, res) {
+        const { id } = req.params;
+
+        const pacients = await Doctor.findByPk(id, {
+            attributes: { exclude: ['created_at', 'updated_at'] },
+            include: {
+                model: Pacient,
+                attributes: { exclude: ['created_at', 'updated_at'] },
+                where: {
+                    [Op.or]: {
+                        base_diseases:{
+                            [Op.eq]: null
+                        },
+                        consultation_reason: {
+                            [Op.eq]: null
+                        },
+                        food_profile: {
+                            [Op.eq]: null
+                        },
+                        chewing_complaint: {
+                            [Op.eq]: null
+                        },
+                        education: {
+                            [Op.eq]: null
+                        },
+                    }
+                },
+                include: {
+                    model: Person,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
                 }
             }
         });
@@ -97,7 +132,7 @@ class DoctorController {
         const { id } = req.params;
 
         const n_pacients = await Doctor.count({
-            where:{
+            where: {
                 doc_id: id
             },
             attributes: { exclude: ['created_at', 'updated_at'] },
@@ -108,15 +143,15 @@ class DoctorController {
                 through: {
                     attributes: []
                 },
-                include: { 
+                include: {
                     model: Person,
                     attributes: { exclude: ['created_at', 'updated_at'] },
-                  
+
                 }
             }
         });
 
-        return res.status(200).send({doc_id: id, num_pacients: n_pacients});
+        return res.status(200).send({ doc_id: id, num_pacients: n_pacients });
     }
 }
 

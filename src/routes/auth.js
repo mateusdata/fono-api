@@ -34,6 +34,7 @@ router.get('/info-doctor/:id', DoctorController.info);
 router.post('/update-doctor/:id', DoctorController.update);
 router.get('/search-pacients/:id', DoctorController.searchMyPacients);
 router.get('/count-pacients/:id', DoctorController.countMyPacients);
+router.get('/pending-pacients/:id', DoctorController.pacientsPendingBasicInfo);
 
 router.post('/create-exercise', ExerciseController.create);
 router.get('/info-exercise/:id', ExerciseController.info);
