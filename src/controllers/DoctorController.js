@@ -58,7 +58,7 @@ class DoctorController {
 
         try {
 
-            const doctor = await Doctor.findByPk(req.params.id)?.update(updateSchema.parse(req.body));
+            const doctor = await Doctor.findByPk(req.params.id).then((doctor) => doctor.update(updateSchema.parse(req.body)));
 
             if (doctor) {
                 return res.send(doctor)
@@ -66,6 +66,7 @@ class DoctorController {
 
             return res.status(400).send({ mensage: 'Doctor not found' })
         } catch (error) {
+            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
