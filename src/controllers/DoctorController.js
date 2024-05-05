@@ -58,7 +58,7 @@ class DoctorController {
 
         try {
 
-            const doctor = await Doctor.findByPk(doc_id)?.update(updateSchema.parse(req.body));
+            const doctor = await Doctor.findByPk(req.params.id)?.update(updateSchema.parse(req.body));
 
             if (doctor) {
                 return res.send(doctor)
