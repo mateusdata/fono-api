@@ -146,7 +146,12 @@ class QuestionnaireController {
 
             });
 
-            return res.status(200).send(nextQuestionnaire)
+            if (!nextQuestionnaire) {
+                return res.status(404).send('Questionnaire not found');
+            }
+    
+            return res.status(200).send(nextQuestionnaire);
+    
         } catch (error) {
 
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
