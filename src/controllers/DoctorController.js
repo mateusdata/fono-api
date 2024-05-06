@@ -38,7 +38,6 @@ class DoctorController {
                 },
                 include: {
                     model: User,
-
                 }
             });
 
