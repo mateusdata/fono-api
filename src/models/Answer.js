@@ -2,7 +2,6 @@ const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../config/sequelize");
 const Pacient = require("./Pacient");
 const Question = require("./Question");
-const Doctor = require("./Doctor");
 
 
 class Answer extends Model { }
@@ -21,14 +20,6 @@ Answer.init({
         references: {
             model: Pacient,
             key: 'pac_id'
-        }
-    },
-    doc_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Doctor,
-            key: 'doc_id'
         }
     },
     que_id: {
@@ -67,7 +58,5 @@ Pacient.hasMany(Answer, { foreignKey: 'pac_id' });
 Answer.belongsTo(Question, { foreignKey: 'que_id' });
 Question.hasOne(Answer, { foreignKey: 'que_id' });
 
-Answer.belongsTo(Question, { foreignKey: 'doc_id' });
-Question.hasMany(Answer, { foreignKey: 'doc_id' });
 
 module.exports = Answer;

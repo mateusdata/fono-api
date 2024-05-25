@@ -71,12 +71,12 @@ class PacientController {
                     food_profile: food_profile,
                     chewing_complaint: chewing_complaint,
                     education: education,
-                   
+
                 })
             );
 
             await t.commit();
-            
+
             const pacient = await Pacient.findByPk(person.pac_id, { include: Person });
 
             if (pacient) {
@@ -197,6 +197,11 @@ class PacientController {
 
     async search(req, res) {
 
+
+        if (String(req.body.search).length == 0) {
+            return res.status(404).send({ message: 'No pacients Found' });
+        }
+
         // Make sure to not return pacient from other doctors
         try {
 
@@ -210,9 +215,6 @@ class PacientController {
                         model: Doctor,
                         where: {
                             doc_id: req.body.doc_id
-                        },
-                        through: {
-                            attributes: []
                         }
                     }
                 },

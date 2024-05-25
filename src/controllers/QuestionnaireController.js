@@ -171,13 +171,12 @@ class QuestionnaireController {
             const { pac_id, answers } = answerSchema.parse(req.body);
 
             const pacient = await Pacient.findByPk(pac_id);
-            const user = await User.findByPk(whois(req), { include: [Doctor] });
 
             if (!pacient) {
                 res.status(404).send({ message: 'Pacient not found' });
             }
        
-            const created = await Answer.bulkCreate(answers.map((element) => Object({ ...element, pac_id: pacient.pac_id, doc_id: user?.doctor?.doc_id })));
+            const created = await Answer.bulkCreate(answers.map((element) => Object({ ...element, pac_id: pacient.pac_id })));
 
             if (!created) {
                 return res.status(422).send({ message: "Could not save answers" });
@@ -185,6 +184,34 @@ class QuestionnaireController {
             return res.status(201).send(created);
         } catch (error) {
             console.log(error);
+            return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
+        }
+    }
+
+    async updateQuestionnaire(req, res){
+        const answerSchema = z.object({
+            pac_id: z.number().int().positive(),
+            answers: z.object({
+                que_id: z.number().int().positive(),
+                alternative: z.string().max(150)
+            }).array()
+        });
+
+        try {
+             const { pac_id, answers } = answerSchema.parse(req.body);
+
+            answers.forEach((answer) => {
+                Answer.findOne({
+                    where:{
+                        que_id: answer.que_id,
+                        pac_id: pac_id
+                    }
+                }).then(answered => {
+                    answered.update();
+                });
+            });
+
+        } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -204,9 +231,6 @@ class QuestionnaireController {
                     include: {
                         model: Answer,
                         attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
-                        where:{
-                            doc_id: user?.doctor?.doc_id
-                        },
                         include: {
                             model: Pacient,
                             attributes: [],
@@ -240,9 +264,6 @@ class QuestionnaireController {
                         model: Answer,
                         attributes: { exclude: ['que_id', 'pac_id', 'created_at', 'updated_at'] },
                         required: true,
-                        where:{
-                            doc_id: user?.doctor?.doc_id
-                        },
                         include: {
                             model: Pacient,
                             attributes: [],
