@@ -139,9 +139,6 @@ class DoctorController {
                 required: true,
                 model: Pacient,
                 attributes: { exclude: ['created_at', 'updated_at'] },
-                through: {
-                    attributes: []
-                },
                 include: {
                     model: Person,
                     attributes: { exclude: ['created_at', 'updated_at'] },

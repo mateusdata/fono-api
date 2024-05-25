@@ -11,7 +11,15 @@ DoctorHasPacient.init({
     primaryKey: true,
     autoIncrement: true,
   },
-  doc_id: {
+  giver_doc_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Doctor,
+      key: 'doc_id',
+    },
+    allowNull: false
+  },
+  recipient_doc__id: {
     type: DataTypes.INTEGER,
     references: {
       model: Doctor,
