@@ -16,7 +16,7 @@ const { formatPersonalId, personalIdType, filename, formatPhoneNumber, reportUrl
 const geoLookup = require('../services/LocationService');
 var fs = require('fs');
 const crypto = require('crypto');
-const { error } = require('console');
+const os = require('os');
 
 
 
@@ -58,7 +58,7 @@ class ReportController {
 
         const reportFileName = filename('relatorio_geral_paciente', pacient);
         const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
-        pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
+        pdfDoc.pipe(fs.createWriteStream(`${os.tmpdir()}/${hash}.pdf`));
 
 
         const questionnaires = await Questionnaire.findAll({
@@ -214,7 +214,7 @@ class ReportController {
 
             const reportFileName = filename('recibo_de_servico', pacient);
             const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
-            pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
+            pdfDoc.pipe(fs.createWriteStream(`${os.tmpdir()}/${hash}.pdf`));
 
             /**
              * Emit pageAdded event to trigger the reactangle that is around the page,
@@ -335,7 +335,7 @@ class ReportController {
 
             const reportFileName = filename('relatorio_acompanhamento', pacient);
             const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
-            pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
+            pdfDoc.pipe(fs.createWriteStream(`${os.tmpdir()}/${hash}.pdf`));
 
             /**
             * Emit pageAdded event to trigger the reactangle that is around the page,
@@ -483,7 +483,7 @@ class ReportController {
 
             const reportFileName = filename('relatorio_de_alta', pacient);
             const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
-            pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
+            pdfDoc.pipe(fs.createWriteStream(`${os.tmpdir()}/${hash}.pdf`));
 
             /**
             * Emit pageAdded event to trigger the reactangle that is around the page,
@@ -543,7 +543,7 @@ class ReportController {
     }
 
     async download(req, res) {
-        fs.readFile(`pdfs/${req.query.file}.pdf`, (err, data) => {
+        fs.readFile(`${os.tmpdir()}/${req.query.file}.pdf`, (err, data) => {
             if (err) return res.status(500).send({ message: "Fatal Error", error: err });
 
             res.setHeader('Content-type', 'application/pdf');
