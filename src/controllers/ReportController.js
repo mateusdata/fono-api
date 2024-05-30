@@ -16,6 +16,7 @@ const { formatPersonalId, personalIdType, filename, formatPhoneNumber, reportUrl
 const geoLookup = require('../services/LocationService');
 var fs = require('fs');
 const crypto = require('crypto');
+const { error } = require('console');
 
 
 
@@ -58,7 +59,7 @@ class ReportController {
         const reportFileName = filename('relatorio_geral_paciente', pacient);
         const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
         pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
-        
+
 
         const questionnaires = await Questionnaire.findAll({
             attributes: { exclude: ['created_at', 'updated_at'] },
@@ -122,7 +123,7 @@ class ReportController {
         pdfDoc.font('Helvetica').fillColor('black').text('Anamnese');
         pdfDoc.moveDown();
         pdfDoc.fontSize(12);
-        pdfDoc.font('Helvetica').fillColor('black').text(`Educação: ${pacient?.education || "*********"}`  );
+        pdfDoc.font('Helvetica').fillColor('black').text(`Educação: ${pacient?.education || "*********"}`);
         pdfDoc.font('Helvetica').fillColor('black').text(`Doenças básicas: ${pacient?.base_diseases || "*********"}`);
         pdfDoc.font('Helvetica').fillColor('black').text(`Razão da consulta: ${pacient?.consultation_reason || "*********"}`);
         pdfDoc.font('Helvetica').fillColor('black').text(`Perfil alimentar: ${pacient?.food_profile || "*********"}`);
@@ -156,7 +157,7 @@ class ReportController {
 
         pdfDoc.end();
 
-        return res.status(200).send({doc_name: reportFileName, doc_url: reportUrl(hash)});
+        return res.status(200).send({ doc_name: reportFileName, doc_url: reportUrl(hash) });
     }
 
     async ServiceTerm(req, res) {
@@ -176,12 +177,12 @@ class ReportController {
             const serviceOptions = serviceSchema.parse(req.body);
             let geoIpLocation;
 
-            try{
+            try {
                 geoIpLocation = await geoLookup(serviceOptions.lat, serviceOptions.lon);
-            }catch(error){
+            } catch (error) {
                 console.log(error);
             }
-            
+
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
 
             const pacient = await Pacient.findByPk(req.params.id, {
@@ -263,7 +264,7 @@ class ReportController {
             pdfDoc.text(followUp);
             pdfDoc.moveDown(5);
             pdfDoc.text(S(dateText).template(dateInfo).toString(), { align: 'center' });
-            
+
             const distanceToBottom = height - pdfDoc.y;
 
             if (distanceToBottom < 150) {
@@ -278,7 +279,7 @@ class ReportController {
 
             pdfDoc.end();
 
-            return res.status(200).send({doc_name: reportFileName, doc_url: reportUrl(hash)});
+            return res.status(200).send({ doc_name: reportFileName, doc_url: reportUrl(hash) });
         } catch (error) {
             console.log(error)
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -331,7 +332,7 @@ class ReportController {
             pdfDoc.on('pageAdded', () => {
                 pdfDoc.rect(30, 30, width - 60, height - 60).stroke();
             });
-           
+
             const reportFileName = filename('relatorio_acompanhamento', pacient);
             const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
             pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
@@ -427,7 +428,7 @@ class ReportController {
 
             pdfDoc.end();
 
-            return res.status(200).send({doc_name: reportFileName, doc_url: reportUrl(hash)});
+            return res.status(200).send({ doc_name: reportFileName, doc_url: reportUrl(hash) });
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
@@ -483,7 +484,7 @@ class ReportController {
             const reportFileName = filename('relatorio_de_alta', pacient);
             const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
             pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
-          
+
             /**
             * Emit pageAdded event to trigger the reactangle that is around the page,
             * this is necessary because the document already has one page by default.
@@ -520,7 +521,7 @@ class ReportController {
             }
             pdfDoc.fontSize(12);
             pdfDoc.text(S(template).template(reportData).toString(), { align: 'justify', lineGap: 10 });
-            
+
             const distanceToBottom = height - pdfDoc.y;
 
             if (distanceToBottom < 150) {
@@ -529,21 +530,21 @@ class ReportController {
 
             pdfDoc.moveDown(1);
             pdfDoc.text('__________________________________', { align: 'center' });
-            pdfDoc.moveDown(0.5);  
+            pdfDoc.moveDown(0.5);
             pdfDoc.text(S(contactInfoTemplate).template(contactData).toString(), { align: 'center' });
-            pdfDoc.moveDown(2);           
+            pdfDoc.moveDown(2);
             pdfDoc.text(S(cityTemplate).template(cityData).toString(), { align: 'center' });
             pdfDoc.end();
 
-            return res.status(200).send({doc_name: reportFileName, doc_url: reportUrl(hash)});
+            return res.status(200).send({ doc_name: reportFileName, doc_url: reportUrl(hash) });
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
 
-    async download(req, res){
+    async download(req, res) {
         fs.readFile(`pdfs/${req.query.file}.pdf`, (err, data) => {
-            if (err) return res.status(500).send({message:"Fatal Error"});
+            if (err) return res.status(500).send({ message: "Fatal Error", error: err });
 
             res.setHeader('Content-type', 'application/pdf');
             return res.send(data);
