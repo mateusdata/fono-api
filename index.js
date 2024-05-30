@@ -6,7 +6,7 @@ const AuthRouter = require("./src/routes/auth");
 const ApiRouter = require("./src/routes/api");
 const port = process.env.PORT || 3000;
 var fs = require('fs');
-const cron = require('./cron/cron');
+//const cron = require('./cron/cron');
 
 
 
