@@ -41,7 +41,6 @@ class QuestionnaireController {
 
             return res.status(400).send('Questionnaire could not be created');
         } catch (error) {
-            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -149,9 +148,9 @@ class QuestionnaireController {
             if (!nextQuestionnaire) {
                 return res.status(404).send('Questionnaire not found');
             }
-    
+
             return res.status(200).send(nextQuestionnaire);
-    
+
         } catch (error) {
 
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -175,7 +174,7 @@ class QuestionnaireController {
             if (!pacient) {
                 res.status(404).send({ message: 'Pacient not found' });
             }
-       
+
             const created = await Answer.bulkCreate(answers.map((element) => Object({ ...element, pac_id: pacient.pac_id })));
 
             if (!created) {
@@ -188,28 +187,30 @@ class QuestionnaireController {
         }
     }
 
-    async updateQuestionnaire(req, res){
+    async updateQuestionnaire(req, res) {
         const answerSchema = z.object({
             pac_id: z.number().int().positive(),
             answers: z.object({
                 que_id: z.number().int().positive(),
-                alternative: z.string().max(150)
+                alternative: z.string().max(60)
             }).array()
         });
 
         try {
-             const { pac_id, answers } = answerSchema.parse(req.body);
+            const { pac_id, answers } = answerSchema.parse(req.body);
 
-            answers.forEach((answer) => {
-                Answer.findOne({
-                    where:{
+            answers.forEach(async (answer) => {
+                await Answer.findOne({
+                    where: {
                         que_id: answer.que_id,
                         pac_id: pac_id
                     }
-                }).then(answered => {
-                    answered.update();
+                }).then((answered) => {
+                    answered.update({ que_id: answer.que_id, alternative: answer.alternative });
                 });
             });
+
+            return res.status(200).send({ message: 'Questionnaire Updated' });
 
         } catch (error) {
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
@@ -249,7 +250,7 @@ class QuestionnaireController {
     async allAnsweredQuestionnaireForPacient(req, res) {
 
         const user = await User.findByPk(whois(req), { include: [Doctor] });
-        
+
         const questionnaire = await Questionnaire.findAll({
             attributes: { exclude: ['created_at', 'updated_at'] },
             include: {

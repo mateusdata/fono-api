@@ -76,6 +76,7 @@ router.post('/update-questionnaire/:id', QuestionnaireController.update);
 router.post('/answer-questionnaire', QuestionnaireController.answerQuestionnaire);
 router.get('/answered-questionnaire/:pac_id', QuestionnaireController.allAnsweredQuestionnaireForPacient);
 router.get('/next-questionnaire/:id', QuestionnaireController.nextQuestionnaire);
+router.post('/update-questionnaire', QuestionnaireController.updateQuestionnaire);
 
 router.post('/service-term/:id', ReportController.ServiceTerm);
 router.post('/follow-up-report/:id', ReportController.FollowupReport);
