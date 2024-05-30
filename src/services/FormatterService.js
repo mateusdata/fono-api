@@ -1,5 +1,5 @@
 function filename(prefix, pacient){
-    return `attachment; filename=${prefix}_${pacient?.person?.first_name}_${pacient?.person?.cpf}.pdf`.toLowerCase();
+    return `${prefix}_${pacient?.person?.first_name}_${pacient?.person?.cpf}.pdf`.toLowerCase();
 }
 
 function personalIdType(id) {
@@ -30,4 +30,8 @@ function formatPhoneNumber(phone_number){
     return  phone_number.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
 }
 
-module.exports = { formatPersonalId, personalIdType, filename, formatPhoneNumber };
+function reportUrl(hash){
+    return `${process.env.APP_URL}/download-report?file=${hash}`
+}
+
+module.exports = { formatPersonalId, personalIdType, filename, formatPhoneNumber, reportUrl };

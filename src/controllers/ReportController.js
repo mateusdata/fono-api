@@ -12,10 +12,10 @@ const User = require('../models/User');
 const Doctor = require('../models/Doctor');
 const whois = require('../services/IdentityService');
 const { z, ZodError } = require('zod');
-const { formatPersonalId, personalIdType, filename, formatPhoneNumber } = require('../services/FormatterService');
+const { formatPersonalId, personalIdType, filename, formatPhoneNumber, reportUrl } = require('../services/FormatterService');
 const geoLookup = require('../services/LocationService');
-
-
+var fs = require('fs');
+const crypto = require('crypto');
 
 
 
@@ -32,9 +32,6 @@ class ReportController {
         if (!pacient) {
             return res.status(404).send({ message: 'Pacient not found' });
         }
-
-        res.setHeader('Content-disposition', filename('relatorio_geral_paciente', pacient))
-        res.setHeader('Content-type', 'application/pdf')
 
         let pdfDoc = new PDFDocument({
             size: 'A4',
@@ -58,8 +55,10 @@ class ReportController {
 
         const { outline } = pdfDoc;
 
-        pdfDoc.pipe(res);
-
+        const reportFileName = filename('relatorio_geral_paciente', pacient);
+        const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
+        pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
+        
 
         const questionnaires = await Questionnaire.findAll({
             attributes: { exclude: ['created_at', 'updated_at'] },
@@ -123,11 +122,11 @@ class ReportController {
         pdfDoc.font('Helvetica').fillColor('black').text('Anamnese');
         pdfDoc.moveDown();
         pdfDoc.fontSize(12);
-        pdfDoc.font('Helvetica').fillColor('black').text('Educação: ' + pacient.education);
-        pdfDoc.font('Helvetica').fillColor('black').text('Doenças básicas: ' + pacient.base_diseases);
-        pdfDoc.font('Helvetica').fillColor('black').text('Razão da consulta: ' + pacient.consultation_reason);
-        pdfDoc.font('Helvetica').fillColor('black').text('Perfil alimentar: ' + pacient.food_profile);
-        pdfDoc.font('Helvetica').fillColor('black').text('Reclamações de deglutição: ' + pacient.chewing_complaint);
+        pdfDoc.font('Helvetica').fillColor('black').text(`Educação: ${pacient?.education || "*********"}`  );
+        pdfDoc.font('Helvetica').fillColor('black').text(`Doenças básicas: ${pacient?.base_diseases || "*********"}`);
+        pdfDoc.font('Helvetica').fillColor('black').text(`Razão da consulta: ${pacient?.consultation_reason || "*********"}`);
+        pdfDoc.font('Helvetica').fillColor('black').text(`Perfil alimentar: ${pacient?.food_profile || "*********"}`);
+        pdfDoc.font('Helvetica').fillColor('black').text(`Reclamações de deglutição: ${pacient?.chewing_complaint || "*********"}`);
         pdfDoc.moveDown(2);
 
 
@@ -155,8 +154,9 @@ class ReportController {
             })
         });
 
-
         pdfDoc.end();
+
+        return res.status(200).send({doc_name: reportFileName, doc_url: reportUrl(hash)});
     }
 
     async ServiceTerm(req, res) {
@@ -164,19 +164,24 @@ class ReportController {
         const height = 841.89;
 
         const serviceSchema = z.object({
-            price: z.string().transform((value)=>Number(value)).pipe(z.number().positive()),
-            number_of_sessions: z.string().transform((value)=>Number(value)).pipe(z.number().positive().int()),
-            lat: z.string().transform((value)=>Number(value)).pipe(z.number()).optional(),
-            lon: z.string().transform((value)=>Number(value)).pipe(z.number()).optional(),
+            price: z.number().positive(),
+            number_of_sessions: z.number().positive().int(),
+            lat: z.number().optional(),
+            lon: z.number().optional(),
         });
 
 
         try {
 
-            const serviceOptions = serviceSchema.parse(req.query);
+            const serviceOptions = serviceSchema.parse(req.body);
+            let geoIpLocation;
 
-            console.log(serviceOptions);
-            const geoIpLocation = await geoLookup(serviceOptions.lat, serviceOptions.lon);
+            try{
+                geoIpLocation = await geoLookup(serviceOptions.lat, serviceOptions.lon);
+            }catch(error){
+                console.log(error);
+            }
+            
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
 
             const pacient = await Pacient.findByPk(req.params.id, {
@@ -186,9 +191,6 @@ class ReportController {
             if (!pacient) {
                 return res.status(404).send({ message: 'Pacient has not been found' });
             }
-
-            res.setHeader('Content-disposition', filename('recibo_de_servico', pacient))
-            res.setHeader('Content-type', 'application/pdf')
 
             let pdfDoc = new PDFDocument({
                 size: 'A4',
@@ -209,7 +211,9 @@ class ReportController {
                 pdfDoc.rect(30, 30, width - 60, height - 60).stroke();
             });
 
-            pdfDoc.pipe(res);
+            const reportFileName = filename('recibo_de_servico', pacient);
+            const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
+            pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
 
             /**
              * Emit pageAdded event to trigger the reactangle that is around the page,
@@ -259,6 +263,13 @@ class ReportController {
             pdfDoc.text(followUp);
             pdfDoc.moveDown(5);
             pdfDoc.text(S(dateText).template(dateInfo).toString(), { align: 'center' });
+            
+            const distanceToBottom = height - pdfDoc.y;
+
+            if (distanceToBottom < 150) {
+                pdfDoc.addPage();
+            }
+
             pdfDoc.moveDown(5);
             pdfDoc.text('__________________________________', { align: 'center' });
             pdfDoc.text('Fonoaudióloga(o)', { align: 'center' });
@@ -266,7 +277,10 @@ class ReportController {
             pdfDoc.text(S(doctorIdInfoTemplate).template(doctorIdInfoData).toString(), { align: 'center' });
 
             pdfDoc.end();
+
+            return res.status(200).send({doc_name: reportFileName, doc_url: reportUrl(hash)});
         } catch (error) {
+            console.log(error)
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -287,7 +301,7 @@ class ReportController {
 
         try {
 
-            const doctorAssessment = reportSchema.parse(req.query);
+            const doctorAssessment = reportSchema.parse(req.body);
 
             //const geoIpLocation = geoIp2.lookup(req.ip);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
@@ -298,8 +312,6 @@ class ReportController {
                 return res.status(404).send({ message: 'Pacient has not been found' });
             }
 
-            res.setHeader('Content-disposition', filename('relatorio_acompanhamento', pacient))
-            res.setHeader('Content-type', 'application/pdf')
 
             let pdfDoc = new PDFDocument({
                 size: 'A4',
@@ -319,8 +331,10 @@ class ReportController {
             pdfDoc.on('pageAdded', () => {
                 pdfDoc.rect(30, 30, width - 60, height - 60).stroke();
             });
-
-            pdfDoc.pipe(res);
+           
+            const reportFileName = filename('relatorio_acompanhamento', pacient);
+            const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
+            pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
 
             /**
             * Emit pageAdded event to trigger the reactangle that is around the page,
@@ -397,7 +411,14 @@ class ReportController {
                  * Add to the navegation bar
                  */
                 outline.addItem(key);
-            })
+            });
+
+            const distanceToBottom = height - pdfDoc.y;
+
+            if (distanceToBottom < 150) {
+                pdfDoc.addPage();
+            }
+
 
             pdfDoc.text('__________________________________', { align: 'center' });
             pdfDoc.moveDown();
@@ -405,8 +426,9 @@ class ReportController {
             outline.addItem('Assinatura');
 
             pdfDoc.end();
+
+            return res.status(200).send({doc_name: reportFileName, doc_url: reportUrl(hash)});
         } catch (error) {
-            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
     }
@@ -420,15 +442,15 @@ class ReportController {
             patients_progress: z.string().max(500),
             current_condition: z.string().max(500),
             referrals: z.string().max(500),
-            lat: z.string().transform((value)=>Number(value)).pipe(z.number()).optional(),
-            lon: z.string().transform((value)=>Number(value)).pipe(z.number()).optional(),
+            lat: z.number().optional(),
+            lon: z.number().optional(),
         });
 
         const width = 595.28;
         const height = 841.89;
 
         try {
-            const DischargeReport = DischargeReportSchema.parse(req.query);
+            const DischargeReport = DischargeReportSchema.parse(req.body);
             const user = await User.findByPk(whois(req), { include: [Doctor, Person] });
             const pacient = await Pacient.findByPk(req.params.pac_id, { include: Person });
             const geoIpLocation = await geoLookup(DischargeReport.lat, DischargeReport.lon);
@@ -437,8 +459,6 @@ class ReportController {
                 return res.status(404).send({ message: 'Pacient has not been found' });
             }
 
-            res.setHeader('Content-disposition', filename('relatorio_de_alta', pacient))
-            res.setHeader('Content-type', 'application/pdf')
 
             let pdfDoc = new PDFDocument({
                 size: 'A4',
@@ -460,8 +480,10 @@ class ReportController {
                 pdfDoc.rect(30, 30, width - 60, height - 60).stroke();
             });
 
-            pdfDoc.pipe(res);
-
+            const reportFileName = filename('relatorio_de_alta', pacient);
+            const hash = crypto.createHash('sha256').update(crypto.randomBytes(34)).digest('hex');
+            pdfDoc.pipe(fs.createWriteStream(`pdfs/${hash}.pdf`));
+          
             /**
             * Emit pageAdded event to trigger the reactangle that is around the page,
             * this is necessary because the document already has one page by default.
@@ -471,7 +493,7 @@ class ReportController {
             pdfDoc.moveDown(5);
             pdfDoc.fontSize(14);
             pdfDoc.text('Relatório de Alta', { align: 'center' });
-            pdfDoc.moveDown(5);
+            pdfDoc.moveDown(3);
             const template = `Paciente {{pacient_name}}, {{pacient_age}} ano(s), {{medical_diagnoses}}. O tratamento fonoaudiológico teve início no dia {{treatment_begin_date}},  encontrava-se em uso de SNG/SNE/GTT ou ALIMENTAÇÃO EXCLUSIVA VIA ORAL, {{how_it_was_discovered}}. {{first_session_findings}}. {{therapeutic_plan}}.
             {{patients_progress}}. {{current_condition}}. {{referrals}}. À disposição, `;
 
@@ -484,9 +506,9 @@ class ReportController {
 
             const contactInfoTemplate = `{{doctor_name}} {{gov_license}}\n{{phone_number}}`
             const contactData = {
-                doctor_name: user?.person?.full_name ?? "Dr. Coca Cola",
-                gov_license: user?.doctor?.gov_license ?? "14580",
-                phone_number: formatPhoneNumber("75900000000"),
+                doctor_name: user?.person?.full_name ?? user.nick_name,
+                gov_license: user?.doctor?.gov_license ?? "_________",
+                phone_number: formatPhoneNumber("_______________"),
             }
 
             const cityTemplate = `{{city_name}}, {{day}} de {{month_name}} de {{year}}`;
@@ -498,6 +520,13 @@ class ReportController {
             }
             pdfDoc.fontSize(12);
             pdfDoc.text(S(template).template(reportData).toString(), { align: 'justify', lineGap: 10 });
+            
+            const distanceToBottom = height - pdfDoc.y;
+
+            if (distanceToBottom < 150) {
+                pdfDoc.addPage();
+            }
+
             pdfDoc.moveDown(1);
             pdfDoc.text('__________________________________', { align: 'center' });
             pdfDoc.moveDown(0.5);  
@@ -506,11 +535,19 @@ class ReportController {
             pdfDoc.text(S(cityTemplate).template(cityData).toString(), { align: 'center' });
             pdfDoc.end();
 
-
+            return res.status(200).send({doc_name: reportFileName, doc_url: reportUrl(hash)});
         } catch (error) {
-            console.log(error);
             return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
         }
+    }
+
+    async download(req, res){
+        fs.readFile(`pdfs/${req.query.file}.pdf`, (err, data) => {
+            if (err) return res.status(500).send({message:"Fatal Error"});
+
+            res.setHeader('Content-type', 'application/pdf');
+            return res.send(data);
+        });
     }
 }
 

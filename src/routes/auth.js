@@ -77,9 +77,10 @@ router.post('/answer-questionnaire', QuestionnaireController.answerQuestionnaire
 router.get('/answered-questionnaire/:pac_id', QuestionnaireController.allAnsweredQuestionnaireForPacient);
 router.get('/next-questionnaire/:id', QuestionnaireController.nextQuestionnaire);
 
-router.get('/service-term/:id', ReportController.ServiceTerm);
-router.get('/follow-up-report/:id', ReportController.FollowupReport);
+router.post('/service-term/:id', ReportController.ServiceTerm);
+router.post('/follow-up-report/:id', ReportController.FollowupReport);
 router.get('/generate-report/:id', ReportController.PacientReport);
-router.get('/discharg-report/:pac_id', ReportController.DischargeReport);
+router.post('/discharg-report/:pac_id', ReportController.DischargeReport);
+router.get('/download-report', ReportController.download);
 
 module.exports = router;
