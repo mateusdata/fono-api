@@ -5,6 +5,7 @@ const EmailController = require('./EmailController');
 const sequelize = require('../config/sequelize');
 const { z, ZodError } = require('zod');
 const Doctor = require('../models/Doctor');
+const Person = require('../models/Person');
 //const stripe = require('../services/stripeClient');
 
 class UserController {
@@ -21,15 +22,21 @@ class UserController {
     try {
 
       const { nick_name, password, email } = userSchema.parse(req.body);
+      const slipt_name = nick_name.split(" ");
+      
       const user = await User.create({
         nick_name, password, email, roles: ['doctor'],
         doctor: {
           gov_license: null,
         },
+        person:{
+          first_name: slipt_name[0],
+          last_name: slipt_name[1] 
+        }
       },
         {
           transaction: t,
-          include: User.Doctor
+          include: [User.Doctor, User.Person]
         }
       );
 
@@ -44,7 +51,6 @@ class UserController {
       return res.send({ token, user_id: userDoc.get('use_id'), nick_name: userDoc.get('nick_name'), doc_id: userDoc.get('doctor').get('doc_id'), message: 'User has been created' });
     } catch (error) {
       await t.rollback();
-
       return res.status(500).send(error instanceof ZodError ? error : 'Server Error');
     }
   }

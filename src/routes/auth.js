@@ -16,6 +16,7 @@ const ReportController = require('../controllers/ReportController');
 const AddressController = require('../controllers/AddressController');
 
 const middlewareUser = require('../middleware/login');
+const PhoneNumberController = require('../controllers/PhoneNumberController');
 //const middlewarePayment = require('../middleware/payment');
 
 router.use(middlewareUser);
@@ -28,6 +29,8 @@ router.post('/update-user/:id', UserController.update);
 router.post('/create-person', PersonController.create);
 router.get('/info-person/:id', PersonController.info);
 router.post('/create-address/:id', AddressController.create);
+
+router.post('/create-phone', PhoneNumberController.create);
 
 router.post('/create-doctor', DoctorController.create);
 router.get('/info-doctor/:id', DoctorController.info);

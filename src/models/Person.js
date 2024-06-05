@@ -2,6 +2,7 @@ const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/sequelize');
 const User = require('./User');
 const Address = require('./Address');
+const Phone = require('./Phone');
 
 class Person extends Model { }
 
@@ -38,18 +39,22 @@ Person.init({
   },
   cpf: {
     type: DataTypes.STRING(11),
-    allowNull: false,
+    allowNull: true,
     unique: true
   },
   birthday: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
   },
   created_at: {
     type: DataTypes.DATE,
     allowNull: false,
   },
   updated_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  deleted_at: {
     type: DataTypes.DATE,
     allowNull: true,
   },
@@ -60,6 +65,7 @@ Person.init({
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  deletedAt: 'deleted_at',
   indexes: [
     {
       name: 'person_first_name_last_name_cpf_idx',
@@ -68,10 +74,13 @@ Person.init({
   ]
 });
 
-User.hasOne(Person, { foreignKey: 'use_id', sourceKey: 'use_id' });
+User.Person = User.hasOne(Person, { foreignKey: 'use_id', sourceKey: 'use_id' });
 Person.belongsTo(User, { foreignKey: 'use_id', targetKey: 'use_id' });
 
 Address.belongsTo(Person, { foreignKey: 'per_id', targetKey: 'per_id' });
 Person.hasOne(Address, { foreignKey: 'per_id', sourceKey: 'per_id' });
+
+Person.hasMany(Phone, { foreignKey: 'per_id', sourceKey: 'per_id' });
+Phone.belongsTo(Person, { foreignKey: 'per_id', targetKey: 'per_id' });
 
 module.exports = Person;

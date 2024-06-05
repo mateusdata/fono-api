@@ -4,8 +4,6 @@ const jwt = require("jsonwebtoken");
 const middlewareUser = (req, res, next) => {
   const tokenHeader = req.header("Authorization");
 
-  console.log('No token');
-  
   if (!tokenHeader) {
     return res.status(403).send("Access Unauthorized");
   }
