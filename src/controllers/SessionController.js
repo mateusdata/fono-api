@@ -133,7 +133,8 @@ class SessionController {
                 where: {
                     pac_id: req.params.pac_id,
                     doc_id: user?.doctor?.doc_id
-                }
+                },
+                order: [['created_at', 'desc']]
             });
 
             return res.status(200).send(sessions);

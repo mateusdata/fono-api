@@ -41,8 +41,8 @@ Doctor.init({
   },
 }, {
   sequelize,
-  modelName: 'doctor',
-  tableName: 'doctor',
+  modelName: 'doctors',
+  tableName: 'doctors',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
